@@ -1,0 +1,110 @@
+/* Fonte iOS e reset */
+body {
+  margin: 0;
+  min-height: 100vh; /* Garante altura total da tela */
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  justify-content: center; /* Centraliza horizontalmente */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f9f9fb;
+  color: #333;
+}
+
+.caderno-container {
+  max-width: 1000px;
+  margin: 80px auto;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Títulos */
+h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+.section-title {
+  font-size: 20px;
+  margin-top: 40px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #007aff;
+  padding-bottom: 4px;
+  color: #007aff;
+}
+
+/* Filtros */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.filtros-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.filtros-botoes {
+  flex-direction: row;
+  display: flex;
+  gap: 12px;
+}
+
+.filtros-botoes button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background-color: #007aff;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.filtros-botoes button:hover {
+  background-color: #005fcc;
+}
+
+/* Tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+thead {
+  background-color: #f1f1f1;
+}
+
+th, td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  color: #555;
+  font-weight: 600;
+}
+
+tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .filtros {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .filtros div {
+    width: 100%;
+  }
+}

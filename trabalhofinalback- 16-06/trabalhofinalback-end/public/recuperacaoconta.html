@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clínica Vida Imunizada</title>
+  <link rel="stylesheet" href="cadastro.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h2>Recuperação de conta</h2>
+      <form id="recuperarForm">
+        <div class="input-group">
+          <i class="ri-mail-line"></i>
+          <input type="email" id="email" placeholder="E-mail" required />
+        </div>
+        <div class="input-group">
+          <i class="ri-lock-line"></i>
+          <input type="password" id="novaSenha" placeholder="Nova senha" required />
+        </div>
+        <div class="input-group">
+          <i class="ri-lock-line"></i>
+          <input type="password" id="codigo" placeholder="Código" required />
+        </div>
+        <div class="button-group">
+          <button type="submit" class="sign-up">SIGN UP</button>
+          <button type="button" class="sign-in" onclick="window.location.href='login.html'">SIGN IN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+<script src="recuperarSenha.js"></script>
+
+</html>

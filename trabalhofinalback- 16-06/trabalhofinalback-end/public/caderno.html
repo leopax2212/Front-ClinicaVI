@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Vida Imunizada</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="caderno.css" />
+    <link rel="stylesheet" href="header.css" />
+</head>
+
+<div id="navbar-placeholder"></div>
+
+<body>
+
+    <section id="caderno" class="secao">
+        <div class="caderno-container">
+            <h1>Caderno Digital de Vacinas</h1>
+
+            <!-- Seção de Notificações -->
+            <section>
+                <h2 class="section-title">Notificações de Vacinação</h2>
+                <div id="areaNotificacoes"></div>
+            </section>
+
+            <!-- Filtros -->
+            <div class="filtros">
+                <div class="filtros-item">
+                    <label for="filtroTipo">Filtrar por tipo de vacina:</label><br />
+                    <select id="filtroTipo">
+                        <option value="todos">Todos</option>
+                        <option value="aplicada">Aplicadas</option>
+                        <option value="atrasada">Atrasadas</option>
+                        <option value="agendada">Agendadas</option>
+                    </select>
+                </div>
+
+                <div class="filtros-item">
+                    <label for="dataInicio">Data Início:</label><br />
+                    <input type="date" id="dataInicio" />
+                </div>
+
+                <div class="filtros-item">
+                    <label for="dataFim">Data Fim:</label><br />
+                    <input type="date" id="dataFim" />
+                </div>
+
+                <div class="filtros-item filtros-botoes">
+                    <button onclick="aplicarFiltros()">Aplicar Filtros</button>
+                    <button onclick="limparFiltros()">Limpar</button>
+                    <button onclick="gerarPDF()">Exportar PDF</button>
+                </div>
+            </div>
+
+            <!-- Tabelas -->
+            <section>
+                <h2 class="section-title">Vacinas Aplicadas</h2>
+                <table id="tabelaAplicadas">
+                    <thead>
+                        <tr>
+                            <th>Vacina</th>
+                            <th>Data da Aplicação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2 class="section-title">Vacinas Atrasadas</h2>
+                <table id="tabelaAtrasadas">
+                    <thead>
+                        <tr>
+                            <th>Vacina</th>
+                            <th>Data da Aplicação</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2 class="section-title">Vacinas Agendadas</h2>
+                <table id="tabelaAgendadas">
+                    <thead>
+                        <tr>
+                            <th>Vacina</th>
+                            <th>Data Agendada</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </section>
+        </div>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+    </div>
+</body>
+
+</html>

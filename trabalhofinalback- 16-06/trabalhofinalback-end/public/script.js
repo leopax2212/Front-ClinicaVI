@@ -3,8 +3,8 @@
 // =======================
 function carregarNavbar() {
   fetch("header.html")
-    .then(response => response.text())
-    .then(data => {
+    .then((response) => response.text())
+    .then((data) => {
       document.getElementById("navbar-placeholder").innerHTML = data;
 
       const hamburger = document.querySelector(".vi-hamburger");
@@ -14,12 +14,17 @@ function carregarNavbar() {
       hamburger?.addEventListener("click", () => {
         navLinks?.classList.toggle("ativo");
         if (dropdown) {
-          dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+          dropdown.style.display =
+            dropdown.style.display === "block" ? "none" : "block";
         }
       });
 
       document.addEventListener("click", (e) => {
-        if (dropdown && !dropdown.contains(e.target) && !hamburger.contains(e.target)) {
+        if (
+          dropdown &&
+          !dropdown.contains(e.target) &&
+          !hamburger.contains(e.target)
+        ) {
           dropdown.style.display = "none";
         }
       });
@@ -48,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Carregar navbar
   fetch("header.html")
-    .then(res => res.text())
-    .then(data => {
+    .then((res) => res.text())
+    .then((data) => {
       document.getElementById("navbar-placeholder").innerHTML = data;
     });
 });
@@ -59,13 +64,14 @@ document.addEventListener("DOMContentLoaded", () => {
 // ============================
 function carregarPacientes(select, token) {
   fetch("http://localhost:8080/api/pacientes", {
-    headers: { "Authorization": "Bearer " + token }
+    headers: { Authorization: "Bearer " + token },
   })
-    .then(res => res.json())
-    .then(pacientes => {
-      select.innerHTML = '<option value="" disabled selected>Selecione um paciente</option>';
-      pacientes.forEach(p => {
-        const option = document.createElement('option');
+    .then((res) => res.json())
+    .then((pacientes) => {
+      select.innerHTML =
+        '<option value="" disabled selected>Selecione um paciente</option>';
+      pacientes.forEach((p) => {
+        const option = document.createElement("option");
         option.value = p.id;
         option.textContent = p.nome;
         select.appendChild(option);
@@ -75,13 +81,14 @@ function carregarPacientes(select, token) {
 
 function carregarVacinas(select, token) {
   fetch("http://localhost:8080/vacinas", {
-    headers: { "Authorization": "Bearer " + token }
+    headers: { Authorization: "Bearer " + token },
   })
-    .then(res => res.json())
-    .then(vacinas => {
-      select.innerHTML = '<option value="" disabled selected>Selecione uma vacina</option>';
-      vacinas.forEach(v => {
-        const option = document.createElement('option');
+    .then((res) => res.json())
+    .then((vacinas) => {
+      select.innerHTML =
+        '<option value="" disabled selected>Selecione uma vacina</option>';
+      vacinas.forEach((v) => {
+        const option = document.createElement("option");
         option.value = v.id;
         option.textContent = v.nome;
         select.appendChild(option);
@@ -91,7 +98,7 @@ function carregarVacinas(select, token) {
 
 function preencherHorarios(select) {
   for (let hora = 8; hora <= 17; hora++) {
-    ["00", "30"].forEach(min => {
+    ["00", "30"].forEach((min) => {
       const horaFormatada = `${hora.toString().padStart(2, "0")}:${min}`;
       const option = document.createElement("option");
       option.value = horaFormatada;
@@ -102,10 +109,10 @@ function preencherHorarios(select) {
 }
 
 function inicializarAgendamento(form) {
-  const pacienteSelect = document.getElementById('nome');
-  const vacinaSelect = document.getElementById('vacina');
-  const dataInput = document.getElementById('data');
-  const horarioSelect = document.getElementById('horario');
+  const pacienteSelect = document.getElementById("nome");
+  const vacinaSelect = document.getElementById("vacina");
+  const dataInput = document.getElementById("data");
+  const horarioSelect = document.getElementById("horario");
   const token = localStorage.getItem("token");
 
   carregarPacientes(pacienteSelect, token);
@@ -119,7 +126,7 @@ function inicializarAgendamento(form) {
       pacienteId: pacienteSelect.value,
       vacinaId: vacinaSelect.value,
       dataAplicacao: dataInput.value,
-      hora: horarioSelect.value
+      hora: horarioSelect.value,
     };
 
     console.log("Agendamento enviado:", agendamento);
@@ -128,79 +135,90 @@ function inicializarAgendamento(form) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
+        Authorization: "Bearer " + token,
       },
-      body: JSON.stringify(agendamento)
+      body: JSON.stringify(agendamento),
     })
-    .then(res => {
-      if (res.ok) {
-        alert("Agendamento realizado com sucesso!");
-        form.reset();
-      } else {
-        return res.text().then(text => {
-          let message = "Erro ao agendar.";
-          try {
-            const json = JSON.parse(text);
-            message += " " + (json.message || res.status);
-          } catch (e) {
-            message += " Código: " + res.status;
-          }
-          alert(message);
-        });
-      }
-    })
-    .catch(err => {
-      console.error("Erro na requisição:", err);
-      alert("Erro na requisição.");
-    });
+      .then((res) => {
+        if (res.ok) {
+          alert("Agendamento realizado com sucesso!");
+          form.reset();
+        } else {
+          return res.text().then((text) => {
+            let message = "Erro ao agendar.";
+            try {
+              const json = JSON.parse(text);
+              message += " " + (json.message || res.status);
+            } catch (e) {
+              message += " Código: " + res.status;
+            }
+            alert(message);
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Erro na requisição:", err);
+        alert("Erro na requisição.");
+      });
   });
 }
 
 //Tabela
 
-function preencherTabelasComAPI(filtroTipo, dataInicio, dataFim) {
-  const tbody = document.querySelector("#lista-agendamentos");
-  if (!tbody) return;
+// Função que carrega agendamentos do Mocky e insere na tabela
+async function carregarAgendamentosMocky() {
+  console.log("carregarAgendamentosMocky chamado");
+  try {
+    const response = await fetch(
+      "https://run.mocky.io/v3/ccff442b-4972-4c54-bf2a-d22d5112686e"
+    );
+    if (!response.ok) throw new Error("Erro ao carregar agendamentos");
+    const agendamentos = await response.json();
 
-  tbody.innerHTML = "";
-  const token = localStorage.getItem("token");
+    const tbody = document.getElementById("lista-agendamentos");
+    tbody.innerHTML = ""; // limpa a tabela antes
 
-  fetch("http://localhost:8080/api/agendamentos", {
-    headers: { "Authorization": "Bearer " + token }
-  })
-    .then(res => res.json())
-    .then(agendamentos => {
-      agendamentos.forEach(ag => {
-        const dataStr = ag.dataAplicacao;
-        const nomeVacina = ag.vacinaNome || `Vacina ID ${ag.vacinaId}`;
-        const nomePaciente = ag.pacienteNome || `Paciente ID ${ag.pacienteId}`;
-        const horario = ag.hora || "-";
+    agendamentos.forEach((agendamento) => {
+      const tr = document.createElement("tr");
 
-        const dt = new Date(dataStr);
-        const dentroIntervalo = (!dataInicio || dt >= new Date(dataInicio)) &&
-                                (!dataFim || dt <= new Date(dataFim));
+      tr.innerHTML = `
+       <td>${agendamento.pacienteNome}</td>
+       <td>${formatarData(agendamento.dataAplicacao)}</td>
+       <td>${agendamento.hora}</td>
+       <td>${agendamento.vacinaNome}</td>
+       <td><button class="btn-cancelar" data-id="${agendamento.id}">Cancelar</button></td>
+     `;
 
-        if (!dentroIntervalo) return;
+     // Adiciona evento de clique no botão de cancelar
+     tr.querySelector(".btn-cancelar").addEventListener("click", () => {
+       const confirmar = confirm("Tem certeza que deseja cancelar este agendamento?");
+       if (confirmar) {
+         cancelarAgendamento(agendamento.id); // função que você precisa criar
+       }
+     });
 
-        if (filtroTipo === "todos" || 
-            (filtroTipo === "aplicada" && ag.status === "CONFIRMADO") ||
-            (filtroTipo === "agendada" && ag.status !== "CONFIRMADO")) {
-
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${nomePaciente}</td>
-            <td>${formatarData(dataStr)}</td>
-            <td>${horario}</td>
-            <td>${nomeVacina}</td>
-          `;
-          tbody.appendChild(tr);
-        }
-      });
-    })
-    .catch(err => {
-      console.error("Erro ao buscar agendamentos:", err);
+      tbody.appendChild(tr);
     });
+  } catch (error) {
+    console.error("Erro:", error);
+  }
 }
+
+// Função para formatar data no formato brasileiro dd/mm/aaaa
+function formatarData(dataISO) {
+  const data = new Date(dataISO);
+  return data.toLocaleDateString("pt-BR");
+}
+
+// Carregar agendamentos do Mocky ao carregar a página
+document.addEventListener("DOMContentLoaded", () => {
+  carregarNavbar();
+
+  const formAgendamento = document.getElementById("form-agendamento");
+  if (formAgendamento) inicializarAgendamento(formAgendamento);
+
+  carregarAgendamentosMocky();
+});
 
 // ===========================
 // 3. Caderno de Vacinas (caderno.html)
@@ -238,8 +256,11 @@ function preencherTabelas(filtroTipo, dataInicio, dataFim) {
     return true;
   }
 
-  vacinasAplicadas.forEach(v => {
-    if ((filtroTipo === "todos" || filtroTipo === "aplicada") && dataNoIntervalo(v.data)) {
+  vacinasAplicadas.forEach((v) => {
+    if (
+      (filtroTipo === "todos" || filtroTipo === "aplicada") &&
+      dataNoIntervalo(v.data)
+    ) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${v.nome}</td>
@@ -250,8 +271,11 @@ function preencherTabelas(filtroTipo, dataInicio, dataFim) {
     }
   });
 
-  vacinasAgendadas.forEach(v => {
-    if ((filtroTipo === "todos" || filtroTipo === "agendada") && dataNoIntervalo(v.data)) {
+  vacinasAgendadas.forEach((v) => {
+    if (
+      (filtroTipo === "todos" || filtroTipo === "agendada") &&
+      dataNoIntervalo(v.data)
+    ) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${v.nome}</td>
@@ -286,7 +310,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const formAgendamento = document.getElementById("form-agendamento");
   if (formAgendamento) inicializarAgendamento(formAgendamento);
 
-  if (document.getElementById("tabelaAplicadas")) preencherTabelasComAPI("todos");
+  if (document.getElementById("tabelaAplicadas"))
+    preencherTabelasComAPI("todos");
 });
 
 function aplicarFiltros() {
@@ -295,4 +320,3 @@ function aplicarFiltros() {
   const dataFim = document.getElementById("dataFim").value;
   preencherTabelasComAPI(filtroTipo, dataInicio, dataFim);
 }
-

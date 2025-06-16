@@ -116,19 +116,23 @@ th {
   color: #555;
 }
 
-.btn-cancelar {
-  background-color: #ff3b30;
+#tabela-agendamentos tr td .btn-cancelar {
+  display: none;
+  background-color: #ff4d4f;
   color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s;
+  border-radius: 5px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
 }
 
-.btn-cancelar:hover {
-  background-color: #d22;
+#tabela-agendamentos tr:hover td .btn-cancelar {
+  display: inline-block;
+}
+
+#tabela-agendamentos tr td .btn-cancelar:hover {
+  background-color: #d9363e;
 }
 
 .btn-exportar {

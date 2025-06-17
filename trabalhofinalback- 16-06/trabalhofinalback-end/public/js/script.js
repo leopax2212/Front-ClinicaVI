@@ -2,9 +2,9 @@
 // 1. Navbar (header.html)
 // =======================
 function carregarNavbar() {
-  fetch("header.html")
-    .then((response) => response.text())
-    .then((data) => {
+  fetch("../header.html")
+    .then(res => res.text())
+    .then(data => {
       document.getElementById("navbar-placeholder").innerHTML = data;
 
       const hamburger = document.querySelector(".vi-hamburger");

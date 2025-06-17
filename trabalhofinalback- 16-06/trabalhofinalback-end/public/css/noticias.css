@@ -1,0 +1,90 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f0f2f5;
+  color: #333;
+  padding-top: 80px;
+}
+
+h1 {
+  text-align: center;
+  padding: 20px;
+  color: #2c3e50;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+  margin-top: 80px; /* afasta só o conteúdo */
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stats span {
+  display: inline-block;
+  margin-right: 30px;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+  background: #f9f9f9;
+  cursor: pointer;
+}
+
+#map {
+  height: 400px;
+  border-radius: 12px;
+  margin-top: 15px;
+}
+
+.filter-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+#searchInput {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+#filterButton {
+  padding: 10px 20px;
+  background-color: #0077b6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#filterButton:hover {
+  background-color: #005f86;
+}

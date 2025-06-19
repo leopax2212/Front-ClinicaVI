@@ -23,8 +23,8 @@ function carregarNavbar() {
           dropdown.style.display = "none";
         }
       });
-      
-    // ➕ NOVO: Preencher nome do usuário
+
+    // NOVO: Preencher nome do usuário
       const nomeUsuario = localStorage.getItem("nomeUsuario");
       const nomeElemento = document.getElementById("nome-usuario");
 

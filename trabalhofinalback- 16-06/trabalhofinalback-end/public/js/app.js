@@ -35,7 +35,7 @@ function renderTable(data) {
   data.forEach(doenca => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${doenca.nomeDoenca}</td>
+      <td>${doenca.nome}</td>
       <td>${doenca.local}</td>
       <td>${doenca.casos}</td>
       <td>${doenca.sintomas}</td>
@@ -90,7 +90,7 @@ function clearMarkers() {
 document.getElementById('searchInput').addEventListener('input', function () {
   const term = this.value.toLowerCase();
   const filtered = doencas.filter(d =>
-    d.nomeDoenca.toLowerCase().includes(term) ||
+    d.nome.toLowerCase().includes(term) ||
     d.local.toLowerCase().includes(term)
   );
   renderTable(filtered);

@@ -20,6 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const token = data.token;
 
                 localStorage.setItem("token", token);
+
+                // Salvar o nome no localStorage
+                localStorage.setItem("nomeUsuario", data.nome);
+
                 window.location.href = "index.html";
             } else {
                 alert("Falha no login: Verifique seu e-mail e senha.");

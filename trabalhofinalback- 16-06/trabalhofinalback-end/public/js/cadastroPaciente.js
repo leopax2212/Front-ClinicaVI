@@ -14,19 +14,20 @@ document.addEventListener("DOMContentLoaded", function () {
       numero: document.getElementById("numero").value,
       bairro: document.getElementById("bairro").value,
       cidade: document.getElementById("cidade").value,
-      estado: document.getElementById("estado").value
+      estado: document.getElementById("estado").value,
     };
 
     try {
       const response = await fetch("http://localhost:8080/api/pacientes", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(paciente)
+        body: JSON.stringify(paciente),
       });
 
       if (response.ok) {
+        localStorage.setItem("nomeUsuario", paciente.nome); 
         alert("Paciente cadastrado com sucesso!");
         window.location.href = "login.html";
       } else {

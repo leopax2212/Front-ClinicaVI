@@ -23,6 +23,14 @@ function carregarNavbar() {
           dropdown.style.display = "none";
         }
       });
+      
+    // ➕ NOVO: Preencher nome do usuário
+      const nomeUsuario = localStorage.getItem("nomeUsuario");
+      const nomeElemento = document.getElementById("nome-usuario");
+
+      if (nomeUsuario && nomeElemento) {
+        nomeElemento.textContent = nomeUsuario;
+      }
     });
 }
  
@@ -135,14 +143,8 @@ function inicializarAgendamento(form) {
           carregarAgendamentos(); // Atualiza tabela
         } else {
           return res.text().then((text) => {
-            let message = "Erro ao agendar.";
-            try {
-              const json = JSON.parse(text);
-              message += " " + (json.message || res.status);
-            } catch (e) {
-              message += " Código: " + res.status;
-            }
-            alert(message);
+            let mensagemErro = text || `Erro ao agendar. Código: ${res.status}`;
+            alert(mensagemErro);
           });
         }
       })

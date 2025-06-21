@@ -1,5 +1,3 @@
-
-
 const API_URL = "http://localhost:8080";
 const form = document.getElementById('form-agendamento');
 const pacienteSelect = document.getElementById('nome');

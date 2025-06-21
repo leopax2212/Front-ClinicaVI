@@ -31,7 +31,7 @@ body {
 .design {
     grid-area: design;
     display: none;
-    background-image: url('img/LogoCV.webp');
+    background-image: url('../img/vaclogin.webp');
     background-size: cover;
     background-position: center;
 }

@@ -151,5 +151,8 @@ th {
   background-color: #28a745;
 }
 
+#paginacao {
+  display: none; /* começa invisível até ter mais de 1 página */
+}
 
 

@@ -39,12 +39,22 @@
           <button type="submit">Confirmar Cadastro</button>
         </form>
 
-        <!-- Campo de busca -->
-        <input type="text" id="buscaVacina" placeholder="Buscar vacina por nome..." style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #ccc;" />
-
-        <!-- Tabela -->
         <div class="agendamentos">
           <h2>Vacinas Cadastradas</h2>
+
+          <input
+            type="text"
+            id="buscaVacina"
+            placeholder="Buscar vacina por nome..."
+            style="
+              width: 100%;
+              padding: 10px;
+              margin-bottom: 15px;
+              border-radius: 12px;
+              border: 1px solid #ccc;
+            "
+          />
+
           <table id="tabela-agendamentos">
             <thead>
               <tr>
@@ -58,9 +68,10 @@
             <tbody id="lista-vacinas"></tbody>
           </table>
 
-          <!-- Paginação -->
-          <div id="paginacao" style="margin-top: 15px; text-align: center;"></div>
-        
+          <div
+            id="paginacao"
+            style="margin-top: 15px; text-align: center"
+          ></div>
         </div>
       </div>
     </div>

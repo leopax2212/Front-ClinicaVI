@@ -25,9 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const response = await fetch("http://localhost:8080/vacinas", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token  // <-- token aqui
+          Authorization: "Bearer " + token, // <-- token aqui
         },
         body: JSON.stringify(novaVacina),
       });
@@ -57,8 +57,8 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const response = await fetch("http://localhost:8080/vacinas", {
         headers: {
-          "Authorization": "Bearer " + token  // <-- token na requisição GET
-        }
+          Authorization: "Bearer " + token, // <-- token na requisição GET
+        },
       });
 
       if (response.ok) {
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function aplicarFiltroEBuildTabela() {
     const termo = buscaInput.value.toLowerCase();
-    vacinasFiltradas = vacinasSalvas.filter(v =>
+    vacinasFiltradas = vacinasSalvas.filter((v) =>
       v.vacina.toLowerCase().includes(termo)
     );
     construirTabela();
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const fim = inicio + vacinasPorPagina;
     const vacinasPagina = vacinasFiltradas.slice(inicio, fim);
 
-    vacinasPagina.forEach(vacina => {
+    vacinasPagina.forEach((vacina) => {
       const linha = document.createElement("tr");
       linha.innerHTML = `
         <td>${vacina.vacina}</td>
@@ -98,28 +98,33 @@ document.addEventListener("DOMContentLoaded", function () {
         <td><button class="btn-cancelar">Deletar</button></td>
       `;
 
-      linha.querySelector(".btn-cancelar").addEventListener("click", async () => {
-        if (confirm("Deseja realmente deletar esta vacina?")) {
-          try {
-            const response = await fetch(`http://localhost:8080/vacinas/${vacina.id}`, {
-              method: "DELETE",
-              headers: {
-                "Authorization": "Bearer " + token  // <-- token no DELETE também
+      linha
+        .querySelector(".btn-cancelar")
+        .addEventListener("click", async () => {
+          if (confirm("Deseja realmente deletar esta vacina?")) {
+            try {
+              const response = await fetch(
+                `http://localhost:8080/vacinas/${vacina.id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: "Bearer " + token, // <-- token no DELETE também
+                  },
+                }
+              );
+              if (response.ok) {
+                vacinasSalvas = vacinasSalvas.filter((v) => v.id !== vacina.id);
+                aplicarFiltroEBuildTabela();
+                alert("Vacina deletada com sucesso.");
+              } else {
+                alert("Erro ao deletar vacina.");
               }
-            });
-            if (response.ok) {
-              vacinasSalvas = vacinasSalvas.filter(v => v.id !== vacina.id);
-              aplicarFiltroEBuildTabela();
-              alert("Vacina deletada com sucesso.");
-            } else {
-              alert("Erro ao deletar vacina.");
+            } catch (err) {
+              console.error("Erro ao deletar:", err);
+              alert("Erro de conexão com o servidor.");
             }
-          } catch (err) {
-            console.error("Erro ao deletar:", err);
-            alert("Erro de conexão com o servidor.");
           }
-        }
-      });
+        });
 
       tabela.appendChild(linha);
     });
@@ -131,6 +136,14 @@ document.addEventListener("DOMContentLoaded", function () {
     paginacaoDiv.innerHTML = "";
 
     const totalPaginas = Math.ceil(vacinasFiltradas.length / vacinasPorPagina);
+
+    // Se só tem 1 página ou nenhuma vacina, oculta o paginador
+    if (totalPaginas <= 1) {
+      paginacaoDiv.style.display = "none";
+      return;
+    }
+
+    paginacaoDiv.style.display = "block";
 
     for (let i = 1; i <= totalPaginas; i++) {
       const botao = document.createElement("button");

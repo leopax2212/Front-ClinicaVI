@@ -7,7 +7,10 @@
     <link rel="stylesheet" href="../css/agendamento.css" />
     <link rel="stylesheet" href="../css/header.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -33,11 +36,48 @@
           <label for="sintomas">Sintomas</label>
           <input type="text" id="sintomas" name="sintomas" required />
 
-          <label for="medidas">Medidas preventivas:</label>
+          <label for="medidas">Medidas preventivas</label>
           <input type="text" id="medidas" name="medidas" required />
 
           <button type="submit">Confirmar Cadastro</button>
         </form>
+
+        <!-- Lista de doenças -->
+        <div class="agendamentos">
+          <h2>Doenças Cadastradas</h2>
+
+          <input
+            type="text"
+            id="buscaDoenca"
+            placeholder="Buscar doença por nome..."
+            style="
+              width: 100%;
+              padding: 10px;
+              margin-bottom: 15px;
+              border-radius: 12px;
+              border: 1px solid #ccc;
+            "
+          />
+
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Local</th>
+                <th>Casos</th>
+                <th>Sintomas</th>
+                <th>Medidas</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="lista-doencas"></tbody>
+          </table>
+
+          <div
+            id="paginacao"
+            style="margin-top: 15px; text-align: center"
+          ></div>
+        </div>
       </div>
     </div>
 

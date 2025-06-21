@@ -5,7 +5,7 @@ fetch("../header.html")
     document.getElementById("navbar-placeholder").innerHTML = data;
   });
 
-const apiUrl = "https://run.mocky.io/v3/bdbe58c9-d727-41b5-92e9-4d16b730a0cf";
+const apiUrl = "http://localhost:8080/doencas";
 
 let doencas = [];
 let map, markers = [];
@@ -90,7 +90,7 @@ function clearMarkers() {
 document.getElementById('searchInput').addEventListener('input', function () {
   const term = this.value.toLowerCase();
   const filtered = doencas.filter(d =>
-    d.nome.toLowerCase().includes(term) ||
+    d.nomeDoenca.toLowerCase().includes(term) ||
     d.local.toLowerCase().includes(term)
   );
   renderTable(filtered);

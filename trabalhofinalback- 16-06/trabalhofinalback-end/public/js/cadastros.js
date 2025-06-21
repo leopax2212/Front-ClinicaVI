@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const novaVacina = { vacina, descricao, quantidade, reaplicacao };
 
     try {
-      const response = await fetch("http://localhost:8080/api/vacinas", {
+      const response = await fetch("http://localhost:8080/vacinas", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function carregarVacinasSalvas() {
     try {
-      const response = await fetch("http://localhost:8080/api/vacinas", {
+      const response = await fetch("http://localhost:8080/vacinas", {
         headers: {
           "Authorization": "Bearer " + token  // <-- token na requisição GET
         }
@@ -101,7 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
       linha.querySelector(".btn-cancelar").addEventListener("click", async () => {
         if (confirm("Deseja realmente deletar esta vacina?")) {
           try {
-            const response = await fetch(`http://localhost:8080/api/vacinas/${vacina.id}`, {
+            const response = await fetch(`http://localhost:8080/vacinas/${vacina.id}`, {
               method: "DELETE",
               headers: {
                 "Authorization": "Bearer " + token  // <-- token no DELETE também
@@ -180,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/doencas", {
+      const response = await fetch("http://localhost:8080/doencas", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

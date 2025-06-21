@@ -19,12 +19,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 const data = await response.json();
                 const token = data.token;
 
+                // Armazena token e dados do usuário
                 localStorage.setItem("token", token);
-
-                // Salvar o nome no localStorage
+                localStorage.setItem("usuarioId", data.id); // <-- ESSENCIAL para salvar como confirmador
                 localStorage.setItem("nomeUsuario", data.nome);
 
-                window.location.href = "index.html";
+                window.location.href = "index.html"; // redireciona após login
             } else {
                 alert("Falha no login: Verifique seu e-mail e senha.");
             }

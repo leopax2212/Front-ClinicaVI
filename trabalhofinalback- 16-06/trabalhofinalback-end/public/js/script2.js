@@ -4,7 +4,7 @@ if (document.getElementById("userList")) {
   let users = [];
 
   //ALTERAR LEANDRO
-  fetch("https://run.mocky.io/v3/40a8353f-bb90-4ac5-a2d7-ffc7b05d39cc")
+  fetch("http://localhost:8080/api/pacientes")
     .then((res) => res.json())
     .then((data) => {
       users = data;
@@ -48,7 +48,7 @@ if (document.getElementById("userList")) {
     const novoStatus = user.status === "admin" ? "comum" : "admin";
 
     //alterar LEANDRO
-    fetch(`https://suaapi.com/usuarios/${user.cpf}`, {
+    fetch(`http://localhost:8080/api/pacientes/${user.cpf}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: novoStatus }),
@@ -68,7 +68,7 @@ if (document.getElementById("userList")) {
 
   //ALTERAR LEANDRO
   if (confirm("Tem certeza que deseja excluir este usuário?")) {
-    fetch(`https://suaapi.com/usuarios/${user.cpf}`, {
+    fetch(`http://localhost:8080/api/pacientes/${user.cpf}`, {
       method: "DELETE"
     })
       .then(res => {
@@ -91,51 +91,122 @@ if (document.getElementById("agendamentoList")) {
     renderAgendamentos();
   });
 
-  const agendamentos = [
-    {
-      nome: "Carla Souza",
-      data: "2025-06-15",
-      horario: "14:00",
-      vacina: "Hepatite B",
-      status: "Agendada",
-    },
-    {
-      nome: "João Mendes",
-      data: "2025-06-16",
-      horario: "10:30",
-      vacina: "Covid-19",
-      status: "Agendada",
-    },
-  ];
-
-  function renderAgendamentos() {
+  async function renderAgendamentos() {
     const list = document.getElementById("agendamentoList");
-    list.innerHTML = "";
+    const token = localStorage.getItem("token");
 
-    agendamentos.forEach((agendamento, index) => {
-      const agendamentoDiv = document.createElement("div");
-      agendamentoDiv.className = "agendamento";
+    if (!token) {
+      list.innerHTML = "<p>Token não encontrado. Faça login.</p>";
+      return;
+    }
 
-      agendamentoDiv.innerHTML = `
-      <div class="agendamento-info">
-        <span><strong>Paciente:</strong> ${agendamento.nome}</span>
-        <span><strong>Data:</strong> ${agendamento.data}</span>
-        <span><strong>Horário:</strong> ${agendamento.horario}</span>
-        <span><strong>Vacina:</strong> ${agendamento.vacina}</span>
-        <span><strong>Status:</strong> <span id="status-${index}">${agendamento.status}</span></span>
-      </div>
-      <div class="agendamento-actions">
-        <button class="aplicada-btn" onclick="atualizarStatus(${index}, 'Aplicada')">Aplicada</button>
-        <button class="atrasada-btn" onclick="atualizarStatus(${index}, 'Atrasada')">Atrasada</button>
-      </div>
-    `;
+    try {
+      const response = await fetch("http://localhost:8080/api/agendamentos/pendentes", {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      });
 
-      list.appendChild(agendamentoDiv);
-    });
+      if (!response.ok) {
+        list.innerHTML = "<p>Erro ao carregar agendamentos.</p>";
+        return;
+      }
+
+      const agendamentos = await response.json();
+      list.innerHTML = "";
+
+      agendamentos.forEach((agendamento, index) => {
+        const agendamentoDiv = document.createElement("div");
+        agendamentoDiv.className = "agendamento";
+
+        const horaFormatada = agendamento.hora ? agendamento.hora : "Sem horário";
+        const dias = agendamento.diasEmAtraso < 0 ? 0 : agendamento.diasEmAtraso;
+
+        agendamentoDiv.innerHTML = `
+          <div class="agendamento-info">
+            <span><strong>Paciente:</strong> ${agendamento.pacienteNome}</span>
+            <span><strong>Data:</strong> ${formatarData(agendamento.dataAplicacao)}</span>
+            <span><strong>Horário:</strong> ${horaFormatada}</span>
+            <span><strong>Vacina:</strong> ${agendamento.vacinaNome}</span>
+            <span><strong>Dias em atraso:</strong> ${dias}</span>
+            <span><strong>Status:</strong> <span id="status-${index}">${agendamento.status}</span></span>
+          </div>
+          <div class="agendamento-actions">
+            <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
+            <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
+          </div>
+        `;
+
+        list.appendChild(agendamentoDiv);
+      });
+    } catch (error) {
+      console.error("Erro ao buscar agendamentos:", error);
+      list.innerHTML = "<p>Erro ao conectar com o servidor.</p>";
+    }
   }
 
-  function atualizarStatus(index, novoStatus) {
-    agendamentos[index].status = novoStatus;
-    document.getElementById(`status-${index}`).textContent = novoStatus;
+  function formatarData(dataISO) {
+    const data = new Date(dataISO);
+    return data.toLocaleDateString("pt-BR");
+  }
+
+  function confirmarAplicacao(id) {
+  const token = localStorage.getItem("token");
+  const usuarioConfirmadorId = localStorage.getItem("usuarioId");
+
+  if (!token) {
+    alert("Token de autenticação não encontrado.");
+    return;
+  }
+
+  if (!usuarioConfirmadorId) {
+    alert("ID do usuário confirmador não encontrado. Faça login novamente.");
+    return;
+  }
+
+  fetch(`http://localhost:8080/api/agendamentos/${id}/confirmar?usuarioConfirmadorId=${usuarioConfirmadorId}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    }
+  })
+    .then(async (res) => {
+      if (res.ok) {
+        alert("Aplicação confirmada com sucesso!");
+        renderAgendamentos(); // Atualiza a lista após confirmação
+      } else {
+        const erro = await res.text();
+        alert("Erro ao confirmar aplicação: " + erro);
+      }
+    })
+    .catch(err => {
+      console.error("Erro na requisição:", err);
+      alert("Erro na confirmação de aplicação.");
+    });
+}
+
+  function cancelarAgendamento(id) {
+    const token = localStorage.getItem("token");
+
+    fetch(`http://localhost:8080/api/agendamentos/${id}/cancelar`, {
+      method: "PUT",
+      headers: {
+        "Authorization": "Bearer " + token
+      }
+    })
+      .then(res => {
+        if (res.ok) {
+          alert("Agendamento cancelado!");
+          renderAgendamentos();
+        } else {
+          alert("Erro ao cancelar agendamento.");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Erro no cancelamento.");
+      });
   }
 }

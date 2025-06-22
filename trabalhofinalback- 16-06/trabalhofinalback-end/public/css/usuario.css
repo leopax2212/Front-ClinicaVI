@@ -63,7 +63,6 @@ h1 {
   color: white;
 }
 
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
+#paginacao {
+  display: none; /* começa invisível até ter mais de 1 página */
 }

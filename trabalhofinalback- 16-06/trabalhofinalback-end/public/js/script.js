@@ -62,7 +62,7 @@ function configurarTelaInicial() {
 }
 
 // =======================
-// 3. Agendamento
+// 3. Agendamento (agendamento.html)
 // =======================
 function carregarPacientes(select, token) {
   if (!select || !token) return;
@@ -311,7 +311,7 @@ function formatarData(dataISO) {
 }
 
 // ===============================
-// 4. Caderno de Vacinas (Mockado)
+// 4. Caderno de Vacinas (Mockado) (caderno.html)
 // ===============================
 function preencherTabelas(filtroTipo, dataInicio, dataFim) {
   const tbodyAplicadas = document.querySelector("#tabelaAplicadas tbody");

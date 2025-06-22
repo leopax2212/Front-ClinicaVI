@@ -35,7 +35,7 @@ function renderTable(data) {
   data.forEach(doenca => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${doenca.nome}</td>
+      <td>${doenca.nomeDoenca}</td>
       <td>${doenca.local}</td>
       <td>${doenca.casos}</td>
       <td>${doenca.sintomas}</td>

@@ -3,7 +3,6 @@
 if (document.getElementById("userList")) {
   let users = [];
 
-  //ALTERAR LEANDRO
   fetch("http://localhost:8080/api/pacientes")
     .then((res) => res.json())
     .then((data) => {
@@ -47,7 +46,6 @@ if (document.getElementById("userList")) {
     const user = users[index];
     const novoStatus = user.status === "admin" ? "comum" : "admin";
 
-    //alterar LEANDRO
     fetch(`http://localhost:8080/api/pacientes/${user.cpf}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -66,7 +64,6 @@ if (document.getElementById("userList")) {
   function deleteUser(index) {
   const user = users[index];
 
-  //ALTERAR LEANDRO
   if (confirm("Tem certeza que deseja excluir este usuário?")) {
     fetch(`http://localhost:8080/api/pacientes/${user.cpf}`, {
       method: "DELETE"
@@ -132,10 +129,12 @@ if (document.getElementById("agendamentoList")) {
             <span><strong>Dias em atraso:</strong> ${dias}</span>
             <span><strong>Status:</strong> <span id="status-${index}">${agendamento.status}</span></span>
           </div>
+          ${agendamento.status === "AGENDADO" ? `
           <div class="agendamento-actions">
             <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
             <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
           </div>
+          ` : ""}
         `;
 
         list.appendChild(agendamentoDiv);
@@ -147,7 +146,7 @@ if (document.getElementById("agendamentoList")) {
   }
 
   function formatarData(dataISO) {
-    const data = new Date(dataISO);
+    const data = new Date(dataISO + "T00:00:00");
     return data.toLocaleDateString("pt-BR");
   }
 

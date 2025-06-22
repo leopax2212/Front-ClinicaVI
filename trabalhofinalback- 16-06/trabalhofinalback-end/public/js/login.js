@@ -20,9 +20,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const token = data.token;
 
                 // Armazena token e dados do usuário
-                localStorage.setItem("token", token);
-                localStorage.setItem("usuarioId", data.id); // <-- ESSENCIAL para salvar como confirmador
-                localStorage.setItem("nomeUsuario", data.nome);
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("usuarioId", data.usuarioId);
+                localStorage.setItem("nomeUsuario", data.nomeUsuario);
+                localStorage.setItem("tipoUsuario", data.tipoUsuario);
 
                 window.location.href = "index.html"; // redireciona após login
             } else {

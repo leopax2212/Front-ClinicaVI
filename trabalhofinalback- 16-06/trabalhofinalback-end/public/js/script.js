@@ -5,7 +5,8 @@ function carregarNavbar() {
   fetch("../header.html")
     .then((res) => res.text())
     .then((data) => {
-      document.getElementById("navbar-placeholder").innerHTML = data;
+      const navbar = document.getElementById("navbar-placeholder");
+      if (navbar) navbar.innerHTML = data;
 
       const hamburger = document.querySelector(".vi-hamburger");
       const navLinks = document.querySelector(".vi-nav-links");
@@ -29,7 +30,6 @@ function carregarNavbar() {
         }
       });
 
-      // NOVO: Preencher nome do usuário
       const nomeUsuario = localStorage.getItem("nomeUsuario");
       const nomeElemento = document.getElementById("nome-usuario");
 
@@ -61,10 +61,11 @@ function configurarTelaInicial() {
   }
 }
 
-// ============================
-// 3. Agendamento (agendamento.html)
-// ============================
+// =======================
+// 3. Agendamento
+// =======================
 function carregarPacientes(select, token) {
+  if (!select || !token) return;
   fetch("http://localhost:8080/api/pacientes", {
     headers: { Authorization: "Bearer " + token },
   })
@@ -82,6 +83,7 @@ function carregarPacientes(select, token) {
 }
 
 function carregarVacinas(select, token) {
+  if (!select || !token) return;
   fetch("http://localhost:8080/vacinas", {
     headers: { Authorization: "Bearer " + token },
   })
@@ -99,6 +101,7 @@ function carregarVacinas(select, token) {
 }
 
 function preencherHorarios(select) {
+  if (!select) return;
   for (let hora = 8; hora <= 17; hora++) {
     ["00", "30"].forEach((min) => {
       const horaFormatada = `${hora.toString().padStart(2, "0")}:${min}`;
@@ -111,12 +114,23 @@ function preencherHorarios(select) {
 }
 
 function inicializarAgendamento(form) {
+  if (!form) return;
+
   const pacienteSelect = document.getElementById("nome");
   const vacinaSelect = document.getElementById("vacina");
   const dataInput = document.getElementById("data");
   const horarioSelect = document.getElementById("horario");
   const submitBtn = form.querySelector("button[type='submit']");
   const token = localStorage.getItem("token");
+
+  if (
+    !pacienteSelect ||
+    !vacinaSelect ||
+    !dataInput ||
+    !horarioSelect ||
+    !token
+  )
+    return;
 
   carregarPacientes(pacienteSelect, token);
   carregarVacinas(vacinaSelect, token);
@@ -147,11 +161,10 @@ function inicializarAgendamento(form) {
         if (res.ok) {
           alert("Agendamento realizado com sucesso!");
           form.reset();
-          carregarAgendamentos(); // Atualiza tabela
+          carregarAgendamentos();
         } else {
           return res.text().then((text) => {
-            let mensagemErro = text || `Erro ao agendar. Código: ${res.status}`;
-            alert(mensagemErro);
+            alert(text || `Erro ao agendar. Código: ${res.status}`);
           });
         }
       })
@@ -163,6 +176,9 @@ function inicializarAgendamento(form) {
   });
 }
 
+// ==============================
+// 3. Listagem e Paginação
+// ==============================
 let agendamentosSalvos = [];
 let agendamentosFiltrados = [];
 let paginaAtual = 1;
@@ -170,12 +186,19 @@ const porPagina = 5;
 
 async function carregarAgendamentos() {
   const token = localStorage.getItem("token");
-  if (!token) return;
+  const pacienteId = localStorage.getItem("usuarioId");
+  if (!token || !pacienteId || !document.getElementById("lista-agendamentos"))
+    return;
 
   try {
-    const response = await fetch("http://localhost:8080/api/agendamentos", {
-      headers: { Authorization: "Bearer " + token },
-    });
+    const response = await fetch(
+      `http://localhost:8080/api/agendamentos/paciente/${pacienteId}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
 
     if (!response.ok) throw new Error("Erro ao carregar agendamentos");
 
@@ -189,7 +212,6 @@ async function carregarAgendamentos() {
 function aplicarPaginacao() {
   const tbody = document.getElementById("lista-agendamentos");
   const paginacaoDiv = document.getElementById("paginacao");
-
   if (!tbody || !paginacaoDiv) return;
 
   agendamentosFiltrados = [...agendamentosSalvos];
@@ -204,20 +226,31 @@ function aplicarPaginacao() {
 
   agendamentosPagina.forEach((agendamento) => {
     const tr = document.createElement("tr");
+    const statusClasse = agendamento.status.toLowerCase();
     tr.innerHTML = `
       <td>${agendamento.pacienteNome}</td>
       <td>${formatarData(agendamento.dataAplicacao)}</td>
       <td>${agendamento.hora || "-"}</td>
       <td>${agendamento.vacinaNome}</td>
-      <td><button class="btn-cancelar" data-id="${
-        agendamento.id
-      }">Cancelar</button></td>
+      <td><span class="status ${statusClasse}">${agendamento.status}</span></td>
+      <td>
+        ${
+          agendamento.status === "AGENDADO"
+            ? `<button class="btn-cancelar" data-id="${agendamento.id}">Cancelar</button>`
+            : "-"
+        }
+      </td>
     `;
-    tr.querySelector(".btn-cancelar").addEventListener("click", () => {
-      if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
-        cancelarAgendamento(agendamento.id);
-      }
-    });
+
+    const btnCancelar = tr.querySelector(".btn-cancelar");
+    if (btnCancelar) {
+      btnCancelar.addEventListener("click", () => {
+        if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
+          cancelarAgendamento(agendamento.id);
+        }
+      });
+    }
+
     tbody.appendChild(tr);
   });
 
@@ -252,20 +285,23 @@ function aplicarPaginacao() {
 
 function cancelarAgendamento(id) {
   const token = localStorage.getItem("token");
-  fetch(`http://localhost:8080/api/agendamentos/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: "Bearer " + token },
+  fetch(`http://localhost:8080/api/agendamentos/${id}/cancelar`, {
+    method: "PUT",
+    headers: {
+      Authorization: "Bearer " + token,
+    },
   })
     .then((res) => {
       if (res.ok) {
-        alert("Agendamento cancelado com sucesso.");
+        alert("Agendamento cancelado!");
         carregarAgendamentos();
       } else {
         alert("Erro ao cancelar agendamento.");
       }
     })
     .catch((err) => {
-      console.error("Erro ao cancelar:", err);
+      console.error(err);
+      alert("Erro no cancelamento.");
     });
 }
 

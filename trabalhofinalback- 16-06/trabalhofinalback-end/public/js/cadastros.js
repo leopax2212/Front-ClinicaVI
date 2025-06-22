@@ -3,10 +3,12 @@
 // =======================
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("form-agendamento");
-  const token = localStorage.getItem("token");
   const buscaInput = document.getElementById("buscaVacina");
   const tabela = document.getElementById("lista-vacinas");
   const paginacaoDiv = document.getElementById("paginacao");
+  const token = localStorage.getItem("token");
+
+  if (!form || !tabela || !paginacaoDiv) return; // Garante que é a página correta
 
   let vacinasSalvas = [];
   let vacinasFiltradas = [];
@@ -16,19 +18,27 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const vacina = document.getElementById("vacina").value.trim();
+    const nome = document.getElementById("vacina").value.trim();
     const descricao = document.getElementById("descricao").value.trim();
-    const quantidade = parseInt(document.getElementById("quantidade").value);
-    const reaplicacao = document.getElementById("reaplicacao").value || null;
+    const fabricante = document.getElementById("fabricante").value.trim();
+    const quantidadeDisponivel = parseInt(document.getElementById("quantidade").value);
+    const reaplicacaoInput = document.getElementById("reaplicacao").value.trim();
+    const diasParaReaplicacao = reaplicacaoInput ? parseInt(reaplicacaoInput) : null;
 
-    const novaVacina = { vacina, descricao, quantidade, reaplicacao };
+    const novaVacina = {
+      nome,
+      descricao,
+      fabricante,
+      quantidadeDisponivel,
+      diasParaReaplicacao
+    };
 
     try {
       const response = await fetch("http://localhost:8080/vacinas", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + token, // <-- token aqui
+          "Authorization": "Bearer " + token
         },
         body: JSON.stringify(novaVacina),
       });
@@ -49,17 +59,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  buscaInput.addEventListener("input", () => {
-    paginaAtual = 1;
-    aplicarFiltroEBuildTabela();
-  });
+  if (buscaInput) {
+    buscaInput.addEventListener("input", () => {
+      paginaAtual = 1;
+      aplicarFiltroEBuildTabela();
+    });
+  }
 
   async function carregarVacinasSalvas() {
     try {
       const response = await fetch("http://localhost:8080/vacinas", {
         headers: {
-          Authorization: "Bearer " + token, // <-- token na requisição GET
-        },
+          "Authorization": "Bearer " + token
+        }
       });
 
       if (response.ok) {
@@ -75,10 +87,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function aplicarFiltroEBuildTabela() {
-    const termo = buscaInput.value.toLowerCase();
-    vacinasFiltradas = vacinasSalvas.filter((v) =>
-      v.vacina.toLowerCase().includes(termo)
+    const termo = buscaInput && buscaInput.value
+      ? buscaInput.value.toLowerCase()
+      : "";
+
+    vacinasFiltradas = vacinasSalvas.filter(v =>
+      v.nome && v.nome.toLowerCase().includes(termo)
     );
+
     construirTabela();
   }
 
@@ -89,43 +105,41 @@ document.addEventListener("DOMContentLoaded", function () {
     const fim = inicio + vacinasPorPagina;
     const vacinasPagina = vacinasFiltradas.slice(inicio, fim);
 
-    vacinasPagina.forEach((vacina) => {
+    vacinasPagina.forEach(vacina => {
       const linha = document.createElement("tr");
       linha.innerHTML = `
-        <td>${vacina.vacina}</td>
+        <td>${vacina.nome}</td>
         <td>${vacina.descricao}</td>
-        <td>${vacina.quantidade}</td>
-        <td>${vacina.reaplicacao || "-"}</td>
+        <td>${vacina.fabricante}</td>
+        <td>${vacina.quantidadeDisponivel}</td>
+        <td>${vacina.diasParaReaplicacao ?? "-"}</td>
         <td><button class="btn-cancelar">Deletar</button></td>
       `;
 
-      linha
-        .querySelector(".btn-cancelar")
-        .addEventListener("click", async () => {
-          if (confirm("Deseja realmente deletar esta vacina?")) {
-            try {
-              const response = await fetch(
-                `http://localhost:8080/vacinas/${vacina.id}`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    Authorization: "Bearer " + token, // <-- token no DELETE também
-                  },
-                }
-              );
-              if (response.ok) {
-                vacinasSalvas = vacinasSalvas.filter((v) => v.id !== vacina.id);
-                aplicarFiltroEBuildTabela();
-                alert("Vacina deletada com sucesso.");
-              } else {
-                alert("Erro ao deletar vacina.");
+      linha.querySelector(".btn-cancelar").addEventListener("click", async () => {
+        if (confirm("Deseja realmente deletar esta vacina?")) {
+          try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`http://localhost:8080/vacinas/${vacina.id}`, {
+              method: "DELETE",
+              headers: {
+                "Authorization": "Bearer " + token
               }
-            } catch (err) {
-              console.error("Erro ao deletar:", err);
-              alert("Erro de conexão com o servidor.");
+            });
+
+            if (response.ok) {
+              vacinasSalvas = vacinasSalvas.filter(v => v.id !== vacina.id);
+              aplicarFiltroEBuildTabela();
+              alert("Vacina deletada com sucesso.");
+            } else {
+              alert("Erro ao deletar vacina.");
             }
+          } catch (err) {
+            console.error("Erro ao deletar:", err);
+            alert("Erro de conexão com o servidor.");
           }
-        });
+        }
+      });
 
       tabela.appendChild(linha);
     });
@@ -137,14 +151,6 @@ document.addEventListener("DOMContentLoaded", function () {
     paginacaoDiv.innerHTML = "";
 
     const totalPaginas = Math.ceil(vacinasFiltradas.length / vacinasPorPagina);
-
-    // Se só tem 1 página ou nenhuma vacina, oculta o paginador
-    if (totalPaginas <= 1) {
-      paginacaoDiv.style.display = "none";
-      return;
-    }
-
-    paginacaoDiv.style.display = "block";
 
     for (let i = 1; i <= totalPaginas; i++) {
       const botao = document.createElement("button");
@@ -186,18 +192,25 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    const nome = document.getElementById("nome").value.trim();
+    const nomeDoenca = document.getElementById("nome").value.trim();
     const local = document.getElementById("local").value.trim();
     const casos = document.getElementById("casos").value.trim();
-    const sintomas = document.getElementById("sintomas").value.trim();
+    const sintomasInput = document.getElementById("sintomas").value.trim();
+    const sintomas = sintomasInput.split(",").map(s => s.trim());
     const medidas = document.getElementById("medidas").value.trim();
+    const medidasPreventivas = medidas ? medidas.split(",").map(item => item.trim()) : [];
 
-    const novaDoenca = { nome, local, casos, sintomas, medidasPreventivas: medidas };
+    const novaDoenca = { nomeDoenca, local, casos, sintomas, medidasPreventivas };
+
 
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:8080/doencas", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
         body: JSON.stringify(novaDoenca),
       });
 
@@ -239,7 +252,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function aplicarFiltroEBuildTabela() {
     const termo = buscaInput.value.toLowerCase();
-    doencasFiltradas = doencasSalvas.filter((d) => d.nome.toLowerCase().includes(termo));
+    doencasFiltradas = doencasSalvas.filter(
+      (d) => (d.nome ?? "").toLowerCase().includes(termo)
+    );
     construirTabela();
   }
 
@@ -253,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function () {
     doencasPagina.forEach((doenca) => {
       const linha = document.createElement("tr");
       linha.innerHTML = `
-        <td>${doenca.nome}</td>
+        <td>${doenca.nomeDoenca}</td>
         <td>${doenca.local}</td>
         <td>${doenca.casos}</td>
         <td>${doenca.sintomas}</td>
@@ -264,8 +279,12 @@ document.addEventListener("DOMContentLoaded", function () {
       linha.querySelector(".btn-cancelar").addEventListener("click", async () => {
         if (confirm("Deseja realmente deletar esta doença?")) {
           try {
+            const token = localStorage.getItem("token");
             const response = await fetch(`http://localhost:8080/doencas/${doenca.id}`, {
               method: "DELETE",
+              headers: {
+                "Authorization": "Bearer " + token
+              }
             });
             if (response.ok) {
               doencasSalvas = doencasSalvas.filter((d) => d.id !== doenca.id);

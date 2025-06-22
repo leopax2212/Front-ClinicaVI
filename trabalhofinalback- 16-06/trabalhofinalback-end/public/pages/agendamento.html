@@ -52,24 +52,26 @@
 
         <!-- Tabela de Agendamentos -->
         <div class="agendamentos">
-          <h2>Meus Agendamentos</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Paciente</th>
-                <th>Data</th>
-                <th>Horário</th>
-                <th>Vacina</th>
-                <th>Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="lista-agendamentos">
-              <!-- Agendamentos serão inseridos aqui -->
-            </tbody>
-          </table>
-          <button id="exportarPdf" class="btn-exportar">Exportar PDF</button>
-          <div id="paginacao" style="margin-top: 20px; text-align: center;"></div>
+          <h2>Agendamentos Cadastrados</h2>
+            <table id="tabela-agendamentos">
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Data</th>
+                  <th>Horário</th>
+                  <th>Vacina</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="lista-agendamentos"></tbody>
+            </table>
+          </div>
+
+          <div
+            id="paginacao"
+            style="margin-top: 15px; text-align: center"
+          ></div>
         </div>
       </div>
     </div>

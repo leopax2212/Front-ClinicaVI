@@ -3,8 +3,17 @@
 if (document.getElementById("userList")) {
   let users = [];
 
-  fetch("http://localhost:8080/api/pacientes")
-    .then((res) => res.json())
+  const token = localStorage.getItem("token");
+
+  fetch("http://localhost:8080/api/usuarios", {
+    headers: {
+      "Authorization": `Bearer ${token}` 
+    }
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Falha na requisição: " + res.status);
+      return res.json();
+    })
     .then((data) => {
       users = data;
       renderUsers();
@@ -25,12 +34,11 @@ if (document.getElementById("userList")) {
           <div class="user-info">
             <span><strong>Nome:</strong> ${user.nome}</span>
             <span><strong>Email:</strong> ${user.email}</span>
-            <span><strong>CPF:</strong> ${user.cpf}</span>
-            <span><strong>Status:</strong> ${user.status}</span>
+            <span><strong>Tipo:</strong> ${user.tipo}</span>
           </div>
           <div class="user-actions">
-            <button class="admin-btn" onclick="toggleAdmin(${index})">
-              Tornar ${user.status === "admin" ? "comum" : "admin"}
+            <button class="admin-btn" onclick="toggleTipo(${index})">
+              Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
             </button>
             <button class="delete-btn" onclick="deleteUser(${index})">
               Excluir
@@ -42,42 +50,27 @@ if (document.getElementById("userList")) {
     });
   }
 
-  function toggleAdmin(index) {
+  window.toggleTipo = function (index) {
     const user = users[index];
-    const novoStatus = user.status === "admin" ? "comum" : "admin";
+    const novoTipo = user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN";
 
-    fetch(`http://localhost:8080/api/pacientes/${user.cpf}`, {
+    fetch(`http://localhost:8080/api/usuarios/${user.id}`, { 
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: novoStatus }),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}` 
+      },
+      body: JSON.stringify({ ...user, tipo: novoTipo })
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Erro ao atualizar status");
-        user.status = novoStatus;
+      .then(res => res.json())
+      .then(data => {
+        alert(data.mensagem);
+        user.tipo = data.usuario.tipo;
         renderUsers();
       })
       .catch((err) => {
-        alert("Não foi possível atualizar o status: " + err.message);
+        alert("Não foi possível atualizar o tipo: " + err.message);
       });
-  }
-
-  function deleteUser(index) {
-  const user = users[index];
-
-  if (confirm("Tem certeza que deseja excluir este usuário?")) {
-    fetch(`http://localhost:8080/api/pacientes/${user.cpf}`, {
-      method: "DELETE"
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Erro ao excluir usuário");
-        // Remove localmente só se backend confirmou exclusão
-        users.splice(index, 1);
-        renderUsers();
-      })
-      .catch(err => {
-        alert("Não foi possível excluir o usuário: " + err.message);
-      });
-    }
   }
 }
 

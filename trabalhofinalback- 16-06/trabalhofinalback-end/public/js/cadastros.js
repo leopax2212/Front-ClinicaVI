@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // =======================
-// 1. DOENCAS.HTML --- CADASTRO DE DOENCA
+// 2. DOENCAS.HTML --- CADASTRO DE DOENCA
 // =======================
 document.addEventListener("DOMContentLoaded", function () {
   const form = document.getElementById("form-agendamento");

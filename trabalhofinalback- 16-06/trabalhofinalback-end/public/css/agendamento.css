@@ -116,43 +116,48 @@ th {
   color: #555;
 }
 
-#tabela-agendamentos tr td .btn-cancelar {
-  display: none;
+.btn-deletar {
   background-color: #ff4d4f;
   color: white;
   border: none;
-  border-radius: 5px;
-  padding: 4px 8px;
-  font-size: 0.85rem;
-  transition: background-color 0.3s ease;
-}
-
-#tabela-agendamentos tr:hover td .btn-cancelar {
-  display: inline-block;
-}
-
-#tabela-agendamentos tr td .btn-cancelar:hover {
-  background-color: #d9363e;
-}
-
-.btn-exportar {
-  margin-top: 20px;
-  padding: 12px 20px;
-  background-color: #34c759;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 15px;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-.btn-exportar:hover {
-  background-color: #28a745;
+.btn-deletar:hover {
+  background-color: #d9363e;
+  transform: scale(1.05);
+}
+
+.btn-deletar:active {
+  transform: scale(0.98);
 }
 
 #paginacao {
-  display: none; /* começa invisível até ter mais de 1 página */
+  display: flex; /* será ativado via JS quando necessário */
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+#paginacao button {
+  padding: 8px 14px;
+  background-color: #ddd;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 500;
+}
+
+#paginacao button.active {
+  background-color: #0071e3;
+  color: white;
 }
 
 .tabela-wrapper {

@@ -21,16 +21,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const nome = document.getElementById("vacina").value.trim();
     const descricao = document.getElementById("descricao").value.trim();
     const fabricante = document.getElementById("fabricante").value.trim();
-    const quantidadeDisponivel = parseInt(document.getElementById("quantidade").value);
-    const reaplicacaoInput = document.getElementById("reaplicacao").value.trim();
-    const diasParaReaplicacao = reaplicacaoInput ? parseInt(reaplicacaoInput) : null;
+    const quantidadeDisponivel = parseInt(
+      document.getElementById("quantidade").value
+    );
+    const reaplicacaoInput = document
+      .getElementById("reaplicacao")
+      .value.trim();
+    const diasParaReaplicacao = reaplicacaoInput
+      ? parseInt(reaplicacaoInput)
+      : null;
 
     const novaVacina = {
       nome,
       descricao,
       fabricante,
       quantidadeDisponivel,
-      diasParaReaplicacao
+      diasParaReaplicacao,
     };
 
     try {
@@ -38,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
+          Authorization: "Bearer " + token,
         },
         body: JSON.stringify(novaVacina),
       });
@@ -70,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const response = await fetch("http://localhost:8080/vacinas", {
         headers: {
-          "Authorization": "Bearer " + token
-        }
+          Authorization: "Bearer " + token,
+        },
       });
 
       if (response.ok) {
@@ -87,12 +93,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function aplicarFiltroEBuildTabela() {
-    const termo = buscaInput && buscaInput.value
-      ? buscaInput.value.toLowerCase()
-      : "";
+    const termo =
+      buscaInput && buscaInput.value ? buscaInput.value.toLowerCase() : "";
 
-    vacinasFiltradas = vacinasSalvas.filter(v =>
-      v.nome && v.nome.toLowerCase().includes(termo)
+    vacinasFiltradas = vacinasSalvas.filter(
+      (v) => v.nome && v.nome.toLowerCase().includes(termo)
     );
 
     construirTabela();
@@ -101,45 +106,56 @@ document.addEventListener("DOMContentLoaded", function () {
   function construirTabela() {
     tabela.innerHTML = "";
 
+    const totalPaginas = Math.ceil(vacinasFiltradas.length / vacinasPorPagina);
+
+    // Corrigir a página atual se ela estiver além do total de páginas (após deletar)
+    if (paginaAtual > totalPaginas && totalPaginas > 0) {
+      paginaAtual = totalPaginas;
+    }
+
     const inicio = (paginaAtual - 1) * vacinasPorPagina;
     const fim = inicio + vacinasPorPagina;
     const vacinasPagina = vacinasFiltradas.slice(inicio, fim);
 
-    vacinasPagina.forEach(vacina => {
+    vacinasPagina.forEach((vacina) => {
       const linha = document.createElement("tr");
       linha.innerHTML = `
-        <td>${vacina.nome}</td>
-        <td>${vacina.descricao}</td>
-        <td>${vacina.fabricante}</td>
-        <td>${vacina.quantidadeDisponivel}</td>
-        <td>${vacina.diasParaReaplicacao ?? "-"}</td>
-        <td><button class="btn-cancelar">Deletar</button></td>
-      `;
+      <td>${vacina.nome}</td>
+      <td>${vacina.descricao}</td>
+      <td>${vacina.fabricante}</td>
+      <td>${vacina.quantidadeDisponivel}</td>
+      <td>${vacina.diasParaReaplicacao ?? "-"}</td>
+      <td><button class="btn-cancelar">Deletar</button></td>
+    `;
 
-      linha.querySelector(".btn-cancelar").addEventListener("click", async () => {
-        if (confirm("Deseja realmente deletar esta vacina?")) {
-          try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:8080/vacinas/${vacina.id}`, {
-              method: "DELETE",
-              headers: {
-                "Authorization": "Bearer " + token
+      linha
+        .querySelector(".btn-cancelar")
+        .addEventListener("click", async () => {
+          if (confirm("Deseja realmente deletar esta vacina?")) {
+            try {
+              const response = await fetch(
+                `http://localhost:8080/vacinas/${vacina.id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: "Bearer " + token,
+                  },
+                }
+              );
+
+              if (response.ok) {
+                vacinasSalvas = vacinasSalvas.filter((v) => v.id !== vacina.id);
+                aplicarFiltroEBuildTabela();
+                alert("Vacina deletada com sucesso.");
+              } else {
+                alert("Erro ao deletar vacina.");
               }
-            });
-
-            if (response.ok) {
-              vacinasSalvas = vacinasSalvas.filter(v => v.id !== vacina.id);
-              aplicarFiltroEBuildTabela();
-              alert("Vacina deletada com sucesso.");
-            } else {
-              alert("Erro ao deletar vacina.");
+            } catch (err) {
+              console.error("Erro ao deletar:", err);
+              alert("Erro de conexão com o servidor.");
             }
-          } catch (err) {
-            console.error("Erro ao deletar:", err);
-            alert("Erro de conexão com o servidor.");
           }
-        }
-      });
+        });
 
       tabela.appendChild(linha);
     });
@@ -152,16 +168,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const totalPaginas = Math.ceil(vacinasFiltradas.length / vacinasPorPagina);
 
+    // Exibe ou esconde a paginação dinamicamente
+    paginacaoDiv.style.display = totalPaginas > 1 ? "flex" : "none";
+
     for (let i = 1; i <= totalPaginas; i++) {
       const botao = document.createElement("button");
       botao.textContent = i;
-      botao.style.margin = "0 5px";
-      botao.style.padding = "8px 12px";
-      botao.style.border = "none";
-      botao.style.borderRadius = "8px";
-      botao.style.backgroundColor = i === paginaAtual ? "#0071e3" : "#ddd";
-      botao.style.color = i === paginaAtual ? "#fff" : "#333";
-      botao.style.cursor = "pointer";
+      botao.classList.toggle("active", i === paginaAtual);
 
       botao.addEventListener("click", () => {
         paginaAtual = i;
@@ -196,12 +209,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const local = document.getElementById("local").value.trim();
     const casos = document.getElementById("casos").value.trim();
     const sintomasInput = document.getElementById("sintomas").value.trim();
-    const sintomas = sintomasInput.split(",").map(s => s.trim());
+    const sintomas = sintomasInput.split(",").map((s) => s.trim());
     const medidas = document.getElementById("medidas").value.trim();
-    const medidasPreventivas = medidas ? medidas.split(",").map(item => item.trim()) : [];
+    const medidasPreventivas = medidas
+      ? medidas.split(",").map((item) => item.trim())
+      : [];
 
-    const novaDoenca = { nomeDoenca, local, casos, sintomas, medidasPreventivas };
-
+    const novaDoenca = {
+      nomeDoenca,
+      local,
+      casos,
+      sintomas,
+      medidasPreventivas,
+    };
 
     try {
       const token = localStorage.getItem("token");
@@ -209,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
+          Authorization: "Bearer " + token,
         },
         body: JSON.stringify(novaDoenca),
       });
@@ -252,8 +272,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function aplicarFiltroEBuildTabela() {
     const termo = buscaInput.value.toLowerCase();
-    doencasFiltradas = doencasSalvas.filter(
-      (d) => (d.nome ?? "").toLowerCase().includes(termo)
+    doencasFiltradas = doencasSalvas.filter((d) =>
+      (d.nomeDoenca ?? "").toLowerCase().includes(termo)
     );
     construirTabela();
   }
@@ -273,32 +293,37 @@ document.addEventListener("DOMContentLoaded", function () {
         <td>${doenca.casos}</td>
         <td>${doenca.sintomas}</td>
         <td>${doenca.medidasPreventivas}</td>
-        <td><button class="btn-cancelar">Deletar</button></td>
+        <td><button class="btn-deletar">Deletar</button></td>
       `;
 
-      linha.querySelector(".btn-cancelar").addEventListener("click", async () => {
-        if (confirm("Deseja realmente deletar esta doença?")) {
-          try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(`http://localhost:8080/doencas/${doenca.id}`, {
-              method: "DELETE",
-              headers: {
-                "Authorization": "Bearer " + token
+      linha
+        .querySelector(".btn-deletar")
+        .addEventListener("click", async () => {
+          if (confirm("Deseja realmente deletar esta doença?")) {
+            try {
+              const token = localStorage.getItem("token");
+              const response = await fetch(
+                `http://localhost:8080/doencas/${doenca.id}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    Authorization: "Bearer " + token,
+                  },
+                }
+              );
+              if (response.ok) {
+                doencasSalvas = doencasSalvas.filter((d) => d.id !== doenca.id);
+                aplicarFiltroEBuildTabela();
+                alert("Doença deletada com sucesso.");
+              } else {
+                alert("Erro ao deletar doença.");
               }
-            });
-            if (response.ok) {
-              doencasSalvas = doencasSalvas.filter((d) => d.id !== doenca.id);
-              aplicarFiltroEBuildTabela();
-              alert("Doença deletada com sucesso.");
-            } else {
-              alert("Erro ao deletar doença.");
+            } catch (err) {
+              console.error("Erro ao deletar:", err);
+              alert("Erro de conexão com o servidor.");
             }
-          } catch (err) {
-            console.error("Erro ao deletar:", err);
-            alert("Erro de conexão com o servidor.");
           }
-        }
-      });
+        });
 
       tabela.appendChild(linha);
     });
@@ -340,4 +365,3 @@ document.addEventListener("DOMContentLoaded", function () {
 
   carregarDoencasSalvas();
 });
-

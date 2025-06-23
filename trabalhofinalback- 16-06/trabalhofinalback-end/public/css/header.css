@@ -145,3 +145,9 @@ body {
   margin: 0;
 }
 
+.vi-header.hidden {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+

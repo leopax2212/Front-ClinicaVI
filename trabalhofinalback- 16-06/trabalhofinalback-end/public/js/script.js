@@ -8,6 +8,26 @@ function carregarNavbar() {
       const navbar = document.getElementById("navbar-placeholder");
       if (navbar) navbar.innerHTML = data;
 
+      // === ESCONDE OPÇÕES DE MENU SE NÃO FOR ADMIN
+      const tipoUsuario = localStorage.getItem("tipoUsuario");
+      const nomeUsuario = localStorage.getItem("nomeUsuario");
+
+      const nomeUsuarioEl = document.getElementById("nome-usuario");
+      if (nomeUsuarioEl && nomeUsuario) {
+        nomeUsuarioEl.textContent = nomeUsuario;
+      }
+
+      if (tipoUsuario !== "ADMIN") {
+        const menuItems = document.querySelectorAll(".vi-dropdown-menu ul li");
+        menuItems.forEach((item) => {
+          const texto = item.textContent.trim().toUpperCase();
+          if (["USUÁRIOS", "DOENÇAS", "VACINAS", "AGENDAMENTOS"].includes(texto)) {
+            item.style.display = "none";
+          }
+        });
+      }
+
+      // === MENU HAMBÚRGUER FUNCIONAL
       const hamburger = document.querySelector(".vi-hamburger");
       const navLinks = document.querySelector(".vi-nav-links");
       const dropdown = document.getElementById("dropdownMenu");
@@ -30,11 +50,17 @@ function carregarNavbar() {
         }
       });
 
-      const nomeUsuario = localStorage.getItem("nomeUsuario");
-      const nomeElemento = document.getElementById("nome-usuario");
-
-      if (nomeUsuario && nomeElemento) {
-        nomeElemento.textContent = nomeUsuario;
+      // === ESCONDER HEADER AO ROLAR E MOSTRAR SOMENTE NO TOPO
+      const header = document.querySelector(".vi-header");
+      if (header) {
+        window.addEventListener("scroll", () => {
+          const scrollY = window.scrollY || window.pageYOffset;
+          if (scrollY === 0) {
+            header.classList.remove("hidden");
+          } else {
+            header.classList.add("hidden");
+          }
+        });
       }
     });
 }

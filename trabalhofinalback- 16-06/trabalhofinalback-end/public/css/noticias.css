@@ -41,10 +41,16 @@ table {
   margin-top: 15px;
 }
 
-th,
-td {
+th, td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
+  text-align: left;
+  vertical-align: middle;
+}
+
+th {
+  font-weight: 600;
+  background-color: #f8f9fa; /* opcional para dar contraste no cabeçalho */
 }
 
 tr:hover {

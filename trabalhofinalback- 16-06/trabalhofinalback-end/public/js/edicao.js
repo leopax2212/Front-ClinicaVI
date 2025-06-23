@@ -52,18 +52,19 @@ if (document.getElementById("userList")) {
 
       div.innerHTML = `
             <div class="user-info">
-              <span><strong>Nome:</strong> ${user.nome}</span>
-              <span><strong>Email:</strong> ${user.email}</span>
-              <span><strong>Tipo:</strong> ${user.tipo}</span>
-            </div>
-            <div class="user-actions">
-              <button class="admin-btn" onclick="toggleTipo(${users.indexOf(
-                user
-              )})">
-                Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
-              </button>
-            </div>
-          `;
+            <span><strong>Nome:</strong> ${user.nome}</span>
+            <span><strong>Email:</strong> ${user.email}</span>
+            <span><strong>Tipo:</strong> ${user.tipo}</span>
+          </div>
+          <div class="user-actions">
+            <button class="admin-btn" onclick="toggleTipo(${index})">
+              Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
+            </button>
+            <button class="delete-btn" onclick="deleteUser(${index})">
+              Excluir
+            </button>
+          </div>
+        `;
 
       userList.appendChild(div);
     });
@@ -146,21 +147,20 @@ if (document.getElementById("userList")) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ ...user, tipo: novoTipo }),
+      body: JSON.stringify({ ...user, tipo: novoTipo })
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         alert(data.mensagem);
         user.tipo = data.usuario.tipo;
         renderUsers();
-        atualizarPaginacao();
       })
       .catch((err) => {
         alert("Não foi possível atualizar o tipo: " + err.message);
       });
-  };
+  }
 }
 
 //listaage.html --- configuração lista agendamentos
@@ -239,29 +239,20 @@ if (document.getElementById("agendamentoList")) {
 
       agendamentoDiv.innerHTML = `
             <div class="agendamento-info">
-              <span><strong>Paciente:</strong> ${
-                agendamento.pacienteNome
-              }</span>
-              <span><strong>Data:</strong> ${formatarData(
-                agendamento.dataAplicacao
-              )}</span>
-              <span><strong>Horário:</strong> ${horaFormatada}</span>
-              <span><strong>Vacina:</strong> ${agendamento.vacinaNome}</span>
-              <span><strong>Dias em atraso:</strong> ${dias}</span>
-              <span><strong>Status:</strong> <span id="status-${index}">${
-        agendamento.status
-      }</span></span>
-            </div>
-            ${
-              agendamento.status === "AGENDADO"
-                ? `
-              <div class="agendamento-actions">
-                <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
-                <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
-              </div>`
-                : ""
-            }
-          `;
+            <span><strong>Paciente:</strong> ${agendamento.pacienteNome}</span>
+            <span><strong>Data:</strong> ${formatarData(agendamento.dataAplicacao)}</span>
+            <span><strong>Horário:</strong> ${horaFormatada}</span>
+            <span><strong>Vacina:</strong> ${agendamento.vacinaNome}</span>
+            <span><strong>Dias em atraso:</strong> ${dias}</span>
+            <span><strong>Status:</strong> <span id="status-${index}">${agendamento.status}</span></span>
+          </div>
+          ${agendamento.status === "AGENDADO" ? `
+          <div class="agendamento-actions">
+            <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
+            <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
+          </div>
+          ` : ""}
+        `;
 
       list.appendChild(agendamentoDiv);
     });

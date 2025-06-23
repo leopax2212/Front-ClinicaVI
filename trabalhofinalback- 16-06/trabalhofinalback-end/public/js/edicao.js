@@ -60,9 +60,6 @@ if (document.getElementById("userList")) {
             <button class="admin-btn" onclick="toggleTipo(${index})">
               Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
             </button>
-            <button class="delete-btn" onclick="deleteUser(${index})">
-              Excluir
-            </button>
           </div>
         `;
 

@@ -67,51 +67,47 @@ if (document.getElementById("userList")) {
     }
 
     // Botão Anterior
-    const liPrev = document.createElement("li");
-    liPrev.className = `page-item ${paginaAtual === 1 ? "disabled" : ""}`;
-    liPrev.innerHTML = `
-    <a class="page-link" href="#" tabindex="-1">Anterior</a>`;
-    liPrev.addEventListener("click", (e) => {
-      e.preventDefault();
+    const btnAnterior = document.createElement("button");
+    btnAnterior.textContent = "Anterior";
+    btnAnterior.disabled = paginaAtual === 1;
+    btnAnterior.className = "pagination-btn";
+    btnAnterior.addEventListener("click", () => {
       if (paginaAtual > 1) {
         paginaAtual--;
         renderUsers();
         atualizarPaginacao();
       }
     });
-    paginacao.appendChild(liPrev);
+    paginacao.appendChild(btnAnterior);
 
-    // Indicadores de páginas
+    // Botões de número de página
     for (let i = 1; i <= totalPaginas; i++) {
-      const li = document.createElement("li");
-      li.className = `page-item ${i === paginaAtual ? "active" : ""}`;
-      li.innerHTML = `
-      <a class="page-link" href="#">${i}</a>`;
-      li.addEventListener("click", (e) => {
-        e.preventDefault();
+      const btnPagina = document.createElement("button");
+      btnPagina.textContent = i;
+      btnPagina.className = `pagination-btn ${
+        i === paginaAtual ? "active" : ""
+      }`;
+      btnPagina.addEventListener("click", () => {
         paginaAtual = i;
         renderUsers();
         atualizarPaginacao();
       });
-      paginacao.appendChild(li);
+      paginacao.appendChild(btnPagina);
     }
 
     // Botão Próxima
-    const liNext = document.createElement("li");
-    liNext.className = `page-item ${
-      paginaAtual === totalPaginas ? "disabled" : ""
-    }`;
-    liNext.innerHTML = `
-    <a class="page-link" href="#">Próxima</a>`;
-    liNext.addEventListener("click", (e) => {
-      e.preventDefault();
+    const btnProxima = document.createElement("button");
+    btnProxima.textContent = "Próxima";
+    btnProxima.disabled = paginaAtual === totalPaginas;
+    btnProxima.className = "pagination-btn";
+    btnProxima.addEventListener("click", () => {
       if (paginaAtual < totalPaginas) {
         paginaAtual++;
         renderUsers();
         atualizarPaginacao();
       }
     });
-    paginacao.appendChild(liNext);
+    paginacao.appendChild(btnProxima);
   }
 
   window.toggleTipo = function (index) {
@@ -239,46 +235,48 @@ if (document.getElementById("agendamentoList")) {
       paginacao.style.display = "flex";
     }
 
-    const liPrev = document.createElement("li");
-    liPrev.className = `page-item ${paginaAtual === 1 ? "disabled" : ""}`;
-    liPrev.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
-    liPrev.addEventListener("click", (e) => {
-      e.preventDefault();
+    // Botão Anterior
+    const btnAnterior = document.createElement("button");
+    btnAnterior.textContent = "Anterior";
+    btnAnterior.disabled = paginaAtual === 1;
+    btnAnterior.className = "pagination-btn";
+    btnAnterior.addEventListener("click", () => {
       if (paginaAtual > 1) {
         paginaAtual--;
         renderPaginaAgendamento();
         atualizarPaginacaoAgendamento();
       }
     });
-    paginacao.appendChild(liPrev);
+    paginacao.appendChild(btnAnterior);
 
+    // Botões de número da página
     for (let i = 1; i <= totalPaginas; i++) {
-      const li = document.createElement("li");
-      li.className = `page-item ${i === paginaAtual ? "active" : ""}`;
-      li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
-      li.addEventListener("click", (e) => {
-        e.preventDefault();
+      const btnPagina = document.createElement("button");
+      btnPagina.textContent = i;
+      btnPagina.className = `pagination-btn ${
+        i === paginaAtual ? "active" : ""
+      }`;
+      btnPagina.addEventListener("click", () => {
         paginaAtual = i;
         renderPaginaAgendamento();
         atualizarPaginacaoAgendamento();
       });
-      paginacao.appendChild(li);
+      paginacao.appendChild(btnPagina);
     }
 
-    const liNext = document.createElement("li");
-    liNext.className = `page-item ${
-      paginaAtual === totalPaginas ? "disabled" : ""
-    }`;
-    liNext.innerHTML = `<a class="page-link" href="#">Próxima</a>`;
-    liNext.addEventListener("click", (e) => {
-      e.preventDefault();
+    // Botão Próxima
+    const btnProxima = document.createElement("button");
+    btnProxima.textContent = "Próxima";
+    btnProxima.disabled = paginaAtual === totalPaginas;
+    btnProxima.className = "pagination-btn";
+    btnProxima.addEventListener("click", () => {
       if (paginaAtual < totalPaginas) {
         paginaAtual++;
         renderPaginaAgendamento();
         atualizarPaginacaoAgendamento();
       }
     });
-    paginacao.appendChild(liNext);
+    paginacao.appendChild(btnProxima);
   }
 
   function formatarData(dataISO) {

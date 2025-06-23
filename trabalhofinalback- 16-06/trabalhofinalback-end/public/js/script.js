@@ -176,6 +176,24 @@ function inicializarAgendamento(form) {
   });
 }
 
+function filtrarAgendamentos() {
+  const filtro = document.getElementById("buscaAgendamento").value.toLowerCase();
+  const linhas = document.querySelectorAll("#tabela-agendamentos tbody tr");
+
+  linhas.forEach((linha) => {
+    const nomePaciente = linha.querySelector("td")?.textContent?.toLowerCase() || "";
+    linha.style.display = nomePaciente.includes(filtro) ? "" : "none";
+  });
+}
+
+// Conectar ao campo de input
+document.addEventListener("DOMContentLoaded", () => {
+  const campoBusca = document.getElementById("buscaAgendamento");
+  if (campoBusca) {
+    campoBusca.addEventListener("input", filtrarAgendamentos);
+  }
+});
+
 // ==============================
 // 3. Listagem e Paginação
 // ==============================

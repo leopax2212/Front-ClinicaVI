@@ -12,7 +12,7 @@
   </head>
 
   <body>
-    <div id="navbar-placeholder"></div>
+   <div id="navbar-placeholder"></div>
 
     <div class="page-container">
       <h1 class="page-title">Agendamento de Vacina</h1>
@@ -53,21 +53,37 @@
         <!-- Tabela de Agendamentos -->
         <div class="agendamentos">
           <h2>Agendamentos Cadastrados</h2>
-            <table id="tabela-agendamentos">
+
+          <input
+            type="text"
+            id="buscaAgendamento"
+            placeholder="Buscar agendamento por paciente..."
+            style="
+              width: 100%;
+              padding: 10px;
+              margin-bottom: 15px;
+              border-radius: 12px;
+              border: 1px solid #ccc;
+            "
+          />
+
+            <div class="tabela-wrapper">
+             <table id="tabela-agendamentos">
               <thead>
-                <tr>
-                  <th>Paciente</th>
-                  <th>Data</th>
-                  <th>Horário</th>
-                  <th>Vacina</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
+               <tr>
+                <th>Paciente</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Vacina</th>
+                <th>Status</th>
+                <th>Ações</th>
+               </tr>
               </thead>
               <tbody id="lista-agendamentos"></tbody>
-            </table>
-          </div>
+             </table>
+            </div>
 
+        </div>
           <div
             id="paginacao"
             style="margin-top: 15px; text-align: center"

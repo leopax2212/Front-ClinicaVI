@@ -4,6 +4,7 @@ if (document.getElementById("userList")) {
   let users = [];
   let paginaAtual = 1;
   const itensPorPagina = 5;
+  let termoBusca = "";
 
   const token = localStorage.getItem("token");
 
@@ -29,34 +30,54 @@ if (document.getElementById("userList")) {
     const userList = document.getElementById("userList");
     userList.innerHTML = "";
 
+    const usuariosFiltrados = termoBusca
+      ? users.filter((user) =>
+          user.nome.toLowerCase().includes(termoBusca.toLowerCase())
+        )
+      : users;
+
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
-    const usuariosPagina = users.slice(inicio, fim);
+    const usuariosPagina = usuariosFiltrados.slice(inicio, fim);
+
+    if (usuariosPagina.length === 0) {
+      userList.innerHTML =
+        "<p style='text-align:center;'>Nenhum usuário encontrado.</p>";
+      return;
+    }
 
     usuariosPagina.forEach((user, index) => {
       const div = document.createElement("div");
       div.className = "user";
 
       div.innerHTML = `
-        <div class="user-info">
-          <span><strong>Nome:</strong> ${user.nome}</span>
-          <span><strong>Email:</strong> ${user.email}</span>
-          <span><strong>Tipo:</strong> ${user.tipo}</span>
-        </div>
-        <div class="user-actions">
-          <button class="admin-btn" onclick="toggleTipo(${inicio + index})">
-            Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
-          </button>
-        </div>
-      `;
+            <div class="user-info">
+              <span><strong>Nome:</strong> ${user.nome}</span>
+              <span><strong>Email:</strong> ${user.email}</span>
+              <span><strong>Tipo:</strong> ${user.tipo}</span>
+            </div>
+            <div class="user-actions">
+              <button class="admin-btn" onclick="toggleTipo(${users.indexOf(
+                user
+              )})">
+                Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
+              </button>
+            </div>
+          `;
 
       userList.appendChild(div);
     });
   }
 
   function atualizarPaginacao() {
-    const totalPaginas = Math.ceil(users.length / itensPorPagina);
     const paginacao = document.getElementById("pagination");
+    const usuariosFiltrados = termoBusca
+      ? users.filter((user) =>
+          user.nome.toLowerCase().includes(termoBusca.toLowerCase())
+        )
+      : users;
+    const totalPaginas = Math.ceil(usuariosFiltrados.length / itensPorPagina);
+
     paginacao.innerHTML = "";
 
     if (totalPaginas <= 1) {
@@ -66,7 +87,6 @@ if (document.getElementById("userList")) {
       paginacao.style.display = "flex";
     }
 
-    // Botão Anterior
     const btnAnterior = document.createElement("button");
     btnAnterior.textContent = "Anterior";
     btnAnterior.disabled = paginaAtual === 1;
@@ -80,7 +100,6 @@ if (document.getElementById("userList")) {
     });
     paginacao.appendChild(btnAnterior);
 
-    // Botões de número de página
     for (let i = 1; i <= totalPaginas; i++) {
       const btnPagina = document.createElement("button");
       btnPagina.textContent = i;
@@ -95,7 +114,6 @@ if (document.getElementById("userList")) {
       paginacao.appendChild(btnPagina);
     }
 
-    // Botão Próxima
     const btnProxima = document.createElement("button");
     btnProxima.textContent = "Próxima";
     btnProxima.disabled = paginaAtual === totalPaginas;
@@ -108,6 +126,16 @@ if (document.getElementById("userList")) {
       }
     });
     paginacao.appendChild(btnProxima);
+  }
+
+  const campoBusca = document.getElementById("buscaUsuario");
+  if (campoBusca) {
+    campoBusca.addEventListener("input", () => {
+      termoBusca = campoBusca.value;
+      paginaAtual = 1;
+      renderUsers();
+      atualizarPaginacao();
+    });
   }
 
   window.toggleTipo = function (index) {
@@ -138,13 +166,14 @@ if (document.getElementById("userList")) {
 //listaage.html --- configuração lista agendamentos
 
 if (document.getElementById("agendamentoList")) {
-  document.addEventListener("DOMContentLoaded", () => {
-    renderAgendamentos();
-  });
-
   let agendamentos = [];
   let paginaAtual = 1;
   const itensPorPagina = 5;
+  let termoBusca = "";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    renderAgendamentos();
+  });
 
   async function renderAgendamentos() {
     const list = document.getElementById("agendamentoList");
@@ -185,9 +214,21 @@ if (document.getElementById("agendamentoList")) {
     const list = document.getElementById("agendamentoList");
     list.innerHTML = "";
 
+    const agendamentosFiltrados = termoBusca
+      ? agendamentos.filter((a) =>
+          a.pacienteNome.toLowerCase().includes(termoBusca.toLowerCase())
+        )
+      : agendamentos;
+
     const inicio = (paginaAtual - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
-    const pagina = agendamentos.slice(inicio, fim);
+    const pagina = agendamentosFiltrados.slice(inicio, fim);
+
+    if (pagina.length === 0) {
+      list.innerHTML =
+        "<p style='text-align:center;'>Nenhum agendamento encontrado.</p>";
+      return;
+    }
 
     pagina.forEach((agendamento, index) => {
       const agendamentoDiv = document.createElement("div");
@@ -197,34 +238,45 @@ if (document.getElementById("agendamentoList")) {
       const dias = agendamento.diasEmAtraso < 0 ? 0 : agendamento.diasEmAtraso;
 
       agendamentoDiv.innerHTML = `
-      <div class="agendamento-info">
-        <span><strong>Paciente:</strong> ${agendamento.pacienteNome}</span>
-        <span><strong>Data:</strong> ${formatarData(
-          agendamento.dataAplicacao
-        )}</span>
-        <span><strong>Horário:</strong> ${horaFormatada}</span>
-        <span><strong>Vacina:</strong> ${agendamento.vacinaNome}</span>
-        <span><strong>Dias em atraso:</strong> ${dias}</span>
-        <span><strong>Status:</strong> <span id="status-${index}">${
+            <div class="agendamento-info">
+              <span><strong>Paciente:</strong> ${
+                agendamento.pacienteNome
+              }</span>
+              <span><strong>Data:</strong> ${formatarData(
+                agendamento.dataAplicacao
+              )}</span>
+              <span><strong>Horário:</strong> ${horaFormatada}</span>
+              <span><strong>Vacina:</strong> ${agendamento.vacinaNome}</span>
+              <span><strong>Dias em atraso:</strong> ${dias}</span>
+              <span><strong>Status:</strong> <span id="status-${index}">${
         agendamento.status
       }</span></span>
-      </div>
-      ${
-        agendamento.status === "AGENDADO"
-          ? `<div class="agendamento-actions">
-            <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
-            <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
-          </div>`
-          : ""
-      }
-    `;
+            </div>
+            ${
+              agendamento.status === "AGENDADO"
+                ? `
+              <div class="agendamento-actions">
+                <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
+                <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
+              </div>`
+                : ""
+            }
+          `;
 
       list.appendChild(agendamentoDiv);
     });
   }
 
   function atualizarPaginacaoAgendamento() {
-    const totalPaginas = Math.ceil(agendamentos.length / itensPorPagina);
+    const agendamentosFiltrados = termoBusca
+      ? agendamentos.filter((a) =>
+          a.pacienteNome.toLowerCase().includes(termoBusca.toLowerCase())
+        )
+      : agendamentos;
+
+    const totalPaginas = Math.ceil(
+      agendamentosFiltrados.length / itensPorPagina
+    );
     const paginacao = document.getElementById("pagination");
     paginacao.innerHTML = "";
 
@@ -235,7 +287,6 @@ if (document.getElementById("agendamentoList")) {
       paginacao.style.display = "flex";
     }
 
-    // Botão Anterior
     const btnAnterior = document.createElement("button");
     btnAnterior.textContent = "Anterior";
     btnAnterior.disabled = paginaAtual === 1;
@@ -249,7 +300,6 @@ if (document.getElementById("agendamentoList")) {
     });
     paginacao.appendChild(btnAnterior);
 
-    // Botões de número da página
     for (let i = 1; i <= totalPaginas; i++) {
       const btnPagina = document.createElement("button");
       btnPagina.textContent = i;
@@ -264,7 +314,6 @@ if (document.getElementById("agendamentoList")) {
       paginacao.appendChild(btnPagina);
     }
 
-    // Botão Próxima
     const btnProxima = document.createElement("button");
     btnProxima.textContent = "Próxima";
     btnProxima.disabled = paginaAtual === totalPaginas;
@@ -288,13 +337,8 @@ if (document.getElementById("agendamentoList")) {
     const token = localStorage.getItem("token");
     const usuarioConfirmadorId = localStorage.getItem("usuarioId");
 
-    if (!token) {
-      alert("Token de autenticação não encontrado.");
-      return;
-    }
-
-    if (!usuarioConfirmadorId) {
-      alert("ID do usuário confirmador não encontrado. Faça login novamente.");
+    if (!token || !usuarioConfirmadorId) {
+      alert("Token ou ID do usuário não encontrado. Faça login novamente.");
       return;
     }
 
@@ -311,7 +355,7 @@ if (document.getElementById("agendamentoList")) {
       .then(async (res) => {
         if (res.ok) {
           alert("Aplicação confirmada com sucesso!");
-          renderAgendamentos(); // Atualiza a lista após confirmação
+          renderAgendamentos();
         } else {
           const erro = await res.text();
           alert("Erro ao confirmar aplicação: " + erro);
@@ -344,5 +388,15 @@ if (document.getElementById("agendamentoList")) {
         console.error(err);
         alert("Erro no cancelamento.");
       });
+  }
+
+  const campoBusca = document.getElementById("buscaAgendamentos");
+  if (campoBusca) {
+    campoBusca.addEventListener("input", () => {
+      termoBusca = campoBusca.value;
+      paginaAtual = 1;
+      renderPaginaAgendamento();
+      atualizarPaginacaoAgendamento();
+    });
   }
 }

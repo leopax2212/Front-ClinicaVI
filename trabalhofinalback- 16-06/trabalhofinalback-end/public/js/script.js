@@ -283,13 +283,13 @@ function aplicarPaginacao() {
       <td>
         ${
           agendamento.status === "AGENDADO"
-            ? `<button class="btn-cancelar" data-id="${agendamento.id}">Cancelar</button>`
+            ? `<button class="btn-deletar" data-id="${agendamento.id}">Cancelar</button>`
             : "-"
         }
       </td>
     `;
 
-    const btnCancelar = tr.querySelector(".btn-cancelar");
+    const btnCancelar = tr.querySelector(".btn-deletar");
     if (btnCancelar) {
       btnCancelar.addEventListener("click", () => {
         if (confirm("Tem certeza que deseja cancelar este agendamento?")) {

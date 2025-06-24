@@ -125,11 +125,11 @@ document.addEventListener("DOMContentLoaded", function () {
       <td>${vacina.fabricante}</td>
       <td>${vacina.quantidadeDisponivel}</td>
       <td>${vacina.diasParaReaplicacao ?? "-"}</td>
-      <td><button class="btn-cancelar">Deletar</button></td>
+      <td><button class="btn-deletar">Deletar</button></td>
     `;
 
       linha
-        .querySelector(".btn-cancelar")
+        .querySelector(".btn-deletar")
         .addEventListener("click", async () => {
           if (confirm("Deseja realmente deletar esta vacina?")) {
             try {

@@ -51,17 +51,23 @@ if (document.getElementById("userList")) {
       div.className = "user";
 
       div.innerHTML = `
-            <div class="user-info">
-            <span><strong>Nome:</strong> ${user.nome}</span>
-            <span><strong>Email:</strong> ${user.email}</span>
-            <span><strong>Tipo:</strong> ${user.tipo}</span>
-          </div>
-          <div class="user-actions">
-            <button class="admin-btn" onclick="toggleTipo(${index})">
-              Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
-            </button>
-          </div>
-        `;
+       <div class="user-info">
+         <span><strong>Nome:</strong> ${user.nome}</span>
+         <span><strong>Email:</strong> ${user.email}</span>
+         <span><strong>Tipo:</strong> ${user.tipo}</span>
+       </div>
+       <div class="user-actions">
+         <button class="admin-btn" onclick="toggleTipo(${index})">
+           Tornar ${user.tipo === "ADMIN" ? "PACIENTE" : "ADMIN"}
+         </button>
+         <button class="edit-btn" onclick="editarUsuario(${
+           user.id
+         })">Editar</button>
+         <button class="delete-btn" onclick="excluirUsuario(${
+           user.id
+         })">Excluir</button>
+       </div>
+      `;
 
       userList.appendChild(div);
     });
@@ -144,12 +150,12 @@ if (document.getElementById("userList")) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ ...user, tipo: novoTipo })
+      body: JSON.stringify({ ...user, tipo: novoTipo }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         alert(data.mensagem);
         user.tipo = data.usuario.tipo;
         renderUsers();
@@ -157,7 +163,34 @@ if (document.getElementById("userList")) {
       .catch((err) => {
         alert("Não foi possível atualizar o tipo: " + err.message);
       });
-  }
+  };
+
+  window.editarUsuario = function (id) {
+    localStorage.setItem("editarUsuarioId", id);
+    window.location.href = "edituser.html";
+  };
+
+  window.excluirUsuario = function (id) {
+    const confirmar = confirm("Tem certeza que deseja excluir este usuário?");
+    if (!confirmar) return;
+
+    fetch(`http://localhost:8080/api/usuarios/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Erro ao excluir");
+        alert("Usuário excluído com sucesso.");
+        users = users.filter((user) => user.id !== id);
+        renderUsers();
+        atualizarPaginacao();
+      })
+      .catch((err) => {
+        alert("Erro ao excluir: " + err.message);
+      });
+  };
 }
 
 //listaage.html --- configuração lista agendamentos
@@ -237,18 +270,26 @@ if (document.getElementById("agendamentoList")) {
       agendamentoDiv.innerHTML = `
             <div class="agendamento-info">
             <span><strong>Paciente:</strong> ${agendamento.pacienteNome}</span>
-            <span><strong>Data:</strong> ${formatarData(agendamento.dataAplicacao)}</span>
+            <span><strong>Data:</strong> ${formatarData(
+              agendamento.dataAplicacao
+            )}</span>
             <span><strong>Horário:</strong> ${horaFormatada}</span>
             <span><strong>Vacina:</strong> ${agendamento.vacinaNome}</span>
             <span><strong>Dias em atraso:</strong> ${dias}</span>
-            <span><strong>Status:</strong> <span id="status-${index}">${agendamento.status}</span></span>
+            <span><strong>Status:</strong> <span id="status-${index}">${
+        agendamento.status
+      }</span></span>
           </div>
-          ${agendamento.status === "AGENDADO" ? `
+          ${
+            agendamento.status === "AGENDADO"
+              ? `
           <div class="agendamento-actions">
             <button class="aplicada-btn" onclick="confirmarAplicacao(${agendamento.id})">Aplicada</button>
             <button class="atrasada-btn" onclick="cancelarAgendamento(${agendamento.id})">Cancelar</button>
           </div>
-          ` : ""}
+          `
+              : ""
+          }
         `;
 
       list.appendChild(agendamentoDiv);

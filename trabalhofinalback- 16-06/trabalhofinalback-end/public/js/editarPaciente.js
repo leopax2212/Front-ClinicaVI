@@ -8,14 +8,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   const token = localStorage.getItem("token");
 
   const campos = form.querySelectorAll("input");
-  campos.forEach(input => input.disabled = true); // inicia desabilitado
+  campos.forEach((input) => (input.disabled = true)); // inicia desabilitado
 
-  // Buscar dados do paciente logado
+  // Buscar dados do paciente logado e o selecionado pelo ADMIN
   try {
-    const response = await fetch("http://localhost:8080/api/pacientes/me", {
+    const idSelecionado = localStorage.getItem("editarUsuarioId");
+    const url = idSelecionado
+      ? `http://localhost:8080/api/usuarios/${idSelecionado}`
+      : `http://localhost:8080/api/pacientes/me`;
+
+    const response = await fetch(url, {
       headers: {
-        "Authorization": "Bearer " + token
-      }
+        Authorization: "Bearer " + token,
+      },
     });
 
     if (response.ok) {
@@ -42,7 +47,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Atualizar / Confirmar
   btnAtualizar.addEventListener("click", async () => {
     if (!editando) {
-      campos.forEach(input => input.disabled = false);
+      campos.forEach((input) => {
+        input.disabled = false;
+        input.parentElement.classList.add("editable");
+      });
       btnAtualizar.textContent = "CONFIRMAR ATUALIZAÇÃO";
       editando = true;
       return;
@@ -62,18 +70,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:8080/api/pacientes/${pacienteId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify(pacienteAtualizado)
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/pacientes/${pacienteId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify(pacienteAtualizado),
+        }
+      );
 
       if (response.ok) {
         alert("Cadastro atualizado com sucesso!");
-        window.location.reload();
+
+        // Desabilita os campos e remove estilo de edição
+        campos.forEach((input) => {
+          input.disabled = true;
+          input.parentElement.classList.remove("editable");
+        });
+
+        btnAtualizar.textContent = "ATUALIZAR CADASTRO";
+        editando = false;
       } else {
         const erro = await response.text();
         alert("Erro ao atualizar: " + erro);
@@ -89,12 +108,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!confirmar) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/pacientes/${pacienteId}`, {
-        method: "DELETE",
-        headers: {
-          "Authorization": "Bearer " + token
+      const response = await fetch(
+        `http://localhost:8080/api/pacientes/${pacienteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
         }
-      });
+      );
 
       if (response.ok) {
         alert("Conta excluída com sucesso.");

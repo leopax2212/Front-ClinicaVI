@@ -236,11 +236,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const buscaInput = document.getElementById("buscaDoenca");
   const tabela = document.getElementById("lista-doencas");
   const paginacaoDiv = document.getElementById("paginacao");
+  const token = localStorage.getItem("token");
 
   let doencasSalvas = [];
   let doencasFiltradas = [];
   let paginaAtual = 1;
   const doencasPorPagina = 5;
+  let doencaEditandoId = null;
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -248,12 +250,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const nomeDoenca = document.getElementById("nome").value.trim();
     const local = document.getElementById("local").value.trim();
     const casos = document.getElementById("casos").value.trim();
-    const sintomasInput = document.getElementById("sintomas").value.trim();
-    const sintomas = sintomasInput.split(",").map((s) => s.trim());
-    const medidas = document.getElementById("medidas").value.trim();
-    const medidasPreventivas = medidas
-      ? medidas.split(",").map((item) => item.trim())
-      : [];
+    const sintomas = document
+      .getElementById("sintomas")
+      .value.split(",")
+      .map((s) => s.trim());
+    const medidasPreventivas = document
+      .getElementById("medidas")
+      .value.split(",")
+      .map((m) => m.trim());
 
     const novaDoenca = {
       nomeDoenca,
@@ -264,9 +268,14 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/doencas", {
-        method: "POST",
+      const url = doencaEditandoId
+        ? `http://localhost:8080/doencas/${doencaEditandoId}`
+        : "http://localhost:8080/doencas";
+
+      const method = doencaEditandoId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,
@@ -276,13 +285,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         const doencaSalva = await response.json();
-        alert("Doença cadastrada com sucesso!");
-        doencasSalvas.push(doencaSalva);
-        aplicarFiltroEBuildTabela();
+
+        if (doencaEditandoId) {
+          doencasSalvas = doencasSalvas.map((d) =>
+            d.id === doencaEditandoId ? doencaSalva : d
+          );
+          alert("Doença atualizada com sucesso!");
+        } else {
+          doencasSalvas.push(doencaSalva);
+          alert("Doença cadastrada com sucesso!");
+        }
+
+        doencaEditandoId = null;
         form.reset();
+        aplicarFiltroEBuildTabela();
       } else {
         const erro = await response.text();
-        alert("Erro ao cadastrar doença: " + erro);
+        alert("Erro ao salvar doença: " + erro);
       }
     } catch (err) {
       console.error("Erro na requisição:", err);
@@ -297,7 +316,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function carregarDoencasSalvas() {
     try {
-      const response = await fetch("http://localhost:8080/doencas");
+      const response = await fetch("http://localhost:8080/doencas", {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
+
       if (response.ok) {
         doencasSalvas = await response.json();
         aplicarFiltroEBuildTabela();
@@ -327,48 +351,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
     doencasPagina.forEach((doenca) => {
       const linha = document.createElement("tr");
+
       linha.innerHTML = `
         <td>${doenca.nomeDoenca}</td>
         <td>${doenca.local}</td>
         <td>${doenca.casos}</td>
-        <td>${doenca.sintomas}</td>
-        <td>${doenca.medidasPreventivas}</td>
-        <td><button class="btn-deletar">Deletar</button></td>
+        <td>${doenca.sintomas?.join(", ")}</td>
+        <td>${doenca.medidasPreventivas?.join(", ")}</td>
+        <td>
+         <button class="btn-editar" style="background: none; border: none; cursor: pointer;">
+           <i class="fas fa-pencil-alt" style="color: gray;"></i>
+         </button>
+         <button class="btn-deletar" style="background: none; border: none; cursor: pointer; margin-left: 8px;">
+           <i class="fas fa-trash-alt" style="color: red;"></i>
+         </button>
+       </td>
       `;
 
-      linha
-        .querySelector(".btn-deletar")
-        .addEventListener("click", async () => {
-          if (confirm("Deseja realmente deletar esta doença?")) {
-            try {
-              const token = localStorage.getItem("token");
-              const response = await fetch(
-                `http://localhost:8080/doencas/${doenca.id}`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    Authorization: "Bearer " + token,
-                  },
-                }
-              );
-              if (response.ok) {
-                doencasSalvas = doencasSalvas.filter((d) => d.id !== doenca.id);
-                aplicarFiltroEBuildTabela();
-                alert("Doença deletada com sucesso.");
-              } else {
-                alert("Erro ao deletar doença.");
+      // Botão editar
+      linha.querySelector(".btn-editar").addEventListener("click", () => {
+        preencherFormularioEdicao(doenca);
+      });
+
+      // Botão deletar
+      linha.querySelector(".btn-deletar").addEventListener("click", async () => {
+        if (confirm("Deseja realmente deletar esta doença?")) {
+          try {
+            const response = await fetch(
+              `http://localhost:8080/doencas/${doenca.id}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: "Bearer " + token,
+                },
               }
-            } catch (err) {
-              console.error("Erro ao deletar:", err);
-              alert("Erro de conexão com o servidor.");
+            );
+
+            if (response.ok) {
+              doencasSalvas = doencasSalvas.filter((d) => d.id !== doenca.id);
+              aplicarFiltroEBuildTabela();
+              alert("Doença deletada com sucesso.");
+            } else {
+              alert("Erro ao deletar doença.");
             }
+          } catch (err) {
+            console.error("Erro ao deletar:", err);
+            alert("Erro de conexão com o servidor.");
           }
-        });
+        }
+      });
 
       tabela.appendChild(linha);
     });
 
     construirPaginacao();
+  }
+
+  function preencherFormularioEdicao(doenca) {
+    doencaEditandoId = doenca.id;
+
+    document.getElementById("nome").value = doenca.nomeDoenca;
+    document.getElementById("local").value = doenca.local;
+    document.getElementById("casos").value = doenca.casos;
+    document.getElementById("sintomas").value = doenca.sintomas?.join(", ");
+    document.getElementById("medidas").value = doenca.medidasPreventivas?.join(", ");
+
+    document.getElementById("form-agendamento").scrollIntoView({ behavior: "smooth" });
   }
 
   function construirPaginacao() {
@@ -381,18 +429,12 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    paginacaoDiv.style.display = "block";
+    paginacaoDiv.style.display = "flex";
 
     for (let i = 1; i <= totalPaginas; i++) {
       const botao = document.createElement("button");
       botao.textContent = i;
-      botao.style.margin = "0 5px";
-      botao.style.padding = "8px 12px";
-      botao.style.border = "none";
-      botao.style.borderRadius = "8px";
-      botao.style.backgroundColor = i === paginaAtual ? "#0071e3" : "#ddd";
-      botao.style.color = i === paginaAtual ? "#fff" : "#333";
-      botao.style.cursor = "pointer";
+      botao.classList.toggle("active", i === paginaAtual);
 
       botao.addEventListener("click", () => {
         paginaAtual = i;
@@ -405,3 +447,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
   carregarDoencasSalvas();
 });
+

@@ -174,10 +174,15 @@ function inicializarAgendamento(form) {
       hora: horarioSelect.value,
     };
 
+    const method = agendamentoEditandoId ? "PUT" : "POST";
+    const url = agendamentoEditandoId
+      ? `http://localhost:8080/api/agendamentos/${agendamentoEditandoId}`
+      : "http://localhost:8080/api/agendamentos";
+
     submitBtn.disabled = true;
 
-    fetch("http://localhost:8080/api/agendamentos", {
-      method: "POST",
+    fetch(url, {
+      method: method,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + token,
@@ -187,12 +192,25 @@ function inicializarAgendamento(form) {
       .then((res) => {
         submitBtn.disabled = false;
         if (res.ok) {
-          alert("Agendamento realizado com sucesso!");
+          alert(
+            agendamentoEditandoId
+              ? "Agendamento atualizado com sucesso!"
+              : "Agendamento realizado com sucesso!"
+          );
           form.reset();
+
+          submitBtn.textContent = "Confirmar Agendamento"; // <- aqui muda o texto de volta
+
+          agendamentoEditandoId = null; // resetar modo edição
           carregarAgendamentos();
         } else {
           return res.text().then((text) => {
-            alert(text || `Erro ao agendar. Código: ${res.status}`);
+            alert(
+              text ||
+                `Erro ao ${
+                  agendamentoEditandoId ? "atualizar" : "agendar"
+                }. Código: ${res.status}`
+            );
           });
         }
       })
@@ -230,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==============================
 let agendamentosSalvos = [];
 let agendamentosFiltrados = [];
+let agendamentoEditandoId = null;
 let paginaAtual = 1;
 const porPagina = 5;
 
@@ -288,12 +307,19 @@ function aplicarPaginacao() {
       <td>${agendamento.vacinaNome}</td>
       <td><span class="status ${statusClasse}">${agendamento.status}</span></td>
       <td>
-        ${
-          agendamento.status === "AGENDADO"
-            ? `<button class="btn-deletar" data-id="${agendamento.id}">Cancelar</button>`
-            : "-"
-        }
-      </td>
+         ${
+           agendamento.status === "AGENDADO"
+             ? `
+              <button class="btn-editar" data-id="${agendamento.id}" style="background: none; border: none; cursor: pointer;">
+                <i class="fas fa-pencil-alt" style="color: gray;"></i>
+              </button>
+              <button class="btn-deletar" data-id="${agendamento.id}" style="background: none; border: none; cursor: pointer; margin-left: 8px;">
+               <i class="fas fa-trash-alt" style="color: red;"></i>
+             </button>`
+             : "-"
+         }
+       </td>
+
     `;
 
     const btnCancelar = tr.querySelector(".btn-deletar");
@@ -302,6 +328,14 @@ function aplicarPaginacao() {
         if (confirm("Tem certeza que deseja cancelar este agendamento?")) {
           cancelarAgendamento(agendamento.id);
         }
+      });
+    }
+
+    const btnEditar = tr.querySelector(".btn-editar");
+
+    if (btnEditar) {
+      btnEditar.addEventListener("click", () => {
+        preencherFormularioEdicao(agendamento);
       });
     }
 
@@ -363,6 +397,28 @@ function formatarData(dataISO) {
   if (!dataISO) return "";
   const [ano, mes, dia] = dataISO.split("-");
   return `${dia}/${mes}/${ano}`;
+}
+
+function preencherFormularioEdicao(agendamento) {
+  agendamentoEditandoId = agendamento.id;
+
+  const pacienteSelect = document.getElementById("nome");
+  const vacinaSelect = document.getElementById("vacina");
+  const dataInput = document.getElementById("data");
+  const horarioSelect = document.getElementById("horario");
+
+  pacienteSelect.value = agendamento.pacienteId;
+  vacinaSelect.value = agendamento.vacinaId;
+  dataInput.value = agendamento.dataAplicacao;
+  horarioSelect.value = agendamento.hora;
+
+  if (submitBtn) {
+    submitBtn.textContent = "Atualizar Agendamento";
+  }
+
+  document
+    .getElementById("form-agendamento")
+    .scrollIntoView({ behavior: "smooth" });
 }
 
 // ===============================

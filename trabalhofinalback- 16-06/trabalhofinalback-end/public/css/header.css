@@ -150,4 +150,8 @@ body {
   transition: transform 0.3s ease;
 }
 
+.vi-user-profile a:hover {
+  background-color: transparent !important;
+}
+
 

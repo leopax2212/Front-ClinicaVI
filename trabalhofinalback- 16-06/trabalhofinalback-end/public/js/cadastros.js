@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const tabela = document.getElementById("lista-vacinas");
   const paginacaoDiv = document.getElementById("paginacao");
   const token = localStorage.getItem("token");
+  const btnSubmit = form.querySelector("button[type='submit']");
 
-  if (!form || !tabela || !paginacaoDiv) return; // Garante que é a página correta
-
+  let vacinaEditandoId = null;
   let vacinasSalvas = [];
   let vacinasFiltradas = [];
   let paginaAtual = 1;
@@ -39,9 +39,14 @@ document.addEventListener("DOMContentLoaded", function () {
       diasParaReaplicacao,
     };
 
+    const method = vacinaEditandoId ? "PUT" : "POST";
+    const url = vacinaEditandoId
+      ? `http://localhost:8080/vacinas/${vacinaEditandoId}`
+      : "http://localhost:8080/vacinas";
+
     try {
-      const response = await fetch("http://localhost:8080/vacinas", {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + token,
@@ -51,13 +56,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (response.ok) {
         const vacinaSalva = await response.json();
-        alert("Vacina cadastrada com sucesso!");
-        vacinasSalvas.push(vacinaSalva);
+        alert(
+          vacinaEditandoId
+            ? "Vacina atualizada com sucesso!"
+            : "Vacina cadastrada com sucesso!"
+        );
+
+        if (vacinaEditandoId) {
+          const index = vacinasSalvas.findIndex((v) => v.id === vacinaSalva.id);
+          if (index !== -1) vacinasSalvas[index] = vacinaSalva;
+        } else {
+          vacinasSalvas.push(vacinaSalva);
+        }
+
         aplicarFiltroEBuildTabela();
         form.reset();
+        vacinaEditandoId = null;
+        btnSubmit.textContent = "Confirmar Cadastro";
       } else {
         const erro = await response.text();
-        alert("Erro ao cadastrar vacina: " + erro);
+        alert("Erro ao salvar vacina: " + erro);
       }
     } catch (err) {
       console.error("Erro na requisição:", err);
@@ -107,8 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
     tabela.innerHTML = "";
 
     const totalPaginas = Math.ceil(vacinasFiltradas.length / vacinasPorPagina);
-
-    // Corrigir a página atual se ela estiver além do total de páginas (após deletar)
     if (paginaAtual > totalPaginas && totalPaginas > 0) {
       paginaAtual = totalPaginas;
     }
@@ -120,42 +136,53 @@ document.addEventListener("DOMContentLoaded", function () {
     vacinasPagina.forEach((vacina) => {
       const linha = document.createElement("tr");
       linha.innerHTML = `
-      <td>${vacina.nome}</td>
-      <td>${vacina.descricao}</td>
-      <td>${vacina.fabricante}</td>
-      <td>${vacina.quantidadeDisponivel}</td>
-      <td>${vacina.diasParaReaplicacao ?? "-"}</td>
-      <td><button class="btn-deletar">Deletar</button></td>
-    `;
+       <td>${vacina.nome}</td>
+       <td>${vacina.descricao}</td>
+       <td>${vacina.fabricante}</td>
+       <td>${vacina.quantidadeDisponivel}</td>
+       <td>${vacina.diasParaReaplicacao ?? "-"}</td>
+       <td>
+         <button class="btn-editar" style="background: none; border: none; cursor: pointer;">
+           <i class="fas fa-pencil-alt" style="color: gray;"></i>
+         </button>
+         <button class="btn-deletar" style="background: none; border: none; cursor: pointer; margin-left: 8px;">
+           <i class="fas fa-trash-alt" style="color: red;"></i>
+         </button>
+       </td>
+     `;
 
-      linha
-        .querySelector(".btn-deletar")
-        .addEventListener("click", async () => {
-          if (confirm("Deseja realmente deletar esta vacina?")) {
-            try {
-              const response = await fetch(
-                `http://localhost:8080/vacinas/${vacina.id}`,
-                {
-                  method: "DELETE",
-                  headers: {
-                    Authorization: "Bearer " + token,
-                  },
-                }
-              );
-
-              if (response.ok) {
-                vacinasSalvas = vacinasSalvas.filter((v) => v.id !== vacina.id);
-                aplicarFiltroEBuildTabela();
-                alert("Vacina deletada com sucesso.");
-              } else {
-                alert("Erro ao deletar vacina.");
+      // Deletar vacina
+      linha.querySelector(".btn-deletar").addEventListener("click", async () => {
+        if (confirm("Deseja realmente deletar esta vacina?")) {
+          try {
+            const response = await fetch(
+              `http://localhost:8080/vacinas/${vacina.id}`,
+              {
+                method: "DELETE",
+                headers: {
+                  Authorization: "Bearer " + token,
+                },
               }
-            } catch (err) {
-              console.error("Erro ao deletar:", err);
-              alert("Erro de conexão com o servidor.");
+            );
+
+            if (response.ok) {
+              vacinasSalvas = vacinasSalvas.filter((v) => v.id !== vacina.id);
+              aplicarFiltroEBuildTabela();
+              alert("Vacina deletada com sucesso.");
+            } else {
+              alert("Erro ao deletar vacina.");
             }
+          } catch (err) {
+            console.error("Erro ao deletar:", err);
+            alert("Erro de conexão com o servidor.");
           }
-        });
+        }
+      });
+
+      // Editar vacina
+      linha.querySelector(".btn-editar").addEventListener("click", () => {
+        preencherFormularioEdicao(vacina);
+      });
 
       tabela.appendChild(linha);
     });
@@ -165,10 +192,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function construirPaginacao() {
     paginacaoDiv.innerHTML = "";
-
     const totalPaginas = Math.ceil(vacinasFiltradas.length / vacinasPorPagina);
 
-    // Exibe ou esconde a paginação dinamicamente
     paginacaoDiv.style.display = totalPaginas > 1 ? "flex" : "none";
 
     for (let i = 1; i <= totalPaginas; i++) {
@@ -183,6 +208,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
       paginacaoDiv.appendChild(botao);
     }
+  }
+
+  function preencherFormularioEdicao(vacina) {
+    vacinaEditandoId = vacina.id;
+
+    document.getElementById("vacina").value = vacina.nome;
+    document.getElementById("descricao").value = vacina.descricao;
+    document.getElementById("fabricante").value = vacina.fabricante;
+    document.getElementById("quantidade").value = vacina.quantidadeDisponivel;
+    document.getElementById("reaplicacao").value =
+      vacina.diasParaReaplicacao ?? "";
+
+    btnSubmit.textContent = "Atualizar Vacina";
+
+    form.scrollIntoView({ behavior: "smooth" });
   }
 
   carregarVacinasSalvas();

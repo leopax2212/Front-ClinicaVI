@@ -21,7 +21,9 @@ function carregarNavbar() {
         const menuItems = document.querySelectorAll(".vi-dropdown-menu ul li");
         menuItems.forEach((item) => {
           const texto = item.textContent.trim().toUpperCase();
-          if (["USUÁRIOS", "DOENÇAS", "VACINAS", "AGENDAMENTOS"].includes(texto)) {
+          if (
+            ["USUÁRIOS", "DOENÇAS", "VACINAS", "AGENDAMENTOS"].includes(texto)
+          ) {
             item.style.display = "none";
           }
         });
@@ -252,8 +254,13 @@ async function carregarAgendamentos() {
     agendamentosSalvos = await response.json();
     aplicarPaginacao();
   } catch (error) {
-    console.error("Erro ao carregar agendamentos:", error);
-  }
+    console.error("Erro ao carregar agendamentos:", error);
+  }
+}
+
+function formatarData(dataISO) {
+  const data = new Date(dataISO + "T00:00:00");
+  return data.toLocaleDateString("pt-BR");
 }
 
 function aplicarPaginacao() {
@@ -353,8 +360,9 @@ function cancelarAgendamento(id) {
 }
 
 function formatarData(dataISO) {
-  const data = new Date(dataISO);
-  return data.toLocaleDateString("pt-BR");
+  if (!dataISO) return "";
+  const [ano, mes, dia] = dataISO.split("-");
+  return `${dia}/${mes}/${ano}`;
 }
 
 // ===============================
@@ -546,6 +554,58 @@ function limparFiltros() {
   document.getElementById("dataInicio").value = "";
   document.getElementById("dataFim").value = "";
   preencherTabelas("todos");
+}
+
+function gerarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  let y = 10;
+
+  // Título
+  doc.setFontSize(18);
+  doc.text("Caderno Digital de Vacinas", 10, y);
+  y += 10;
+
+  // Função auxiliar para adicionar uma tabela
+  function adicionarTabela(titulo, tabelaId) {
+    const tabela = document.getElementById(tabelaId);
+    if (!tabela) return;
+
+    const rows = tabela.querySelectorAll("tbody tr");
+
+    if (rows.length === 0) return;
+
+    doc.setFontSize(14);
+    doc.text(titulo, 10, y);
+    y += 6;
+
+    const headers = Array.from(tabela.querySelectorAll("thead th")).map(
+      (th) => th.textContent
+    );
+    const data = Array.from(rows).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => td.textContent)
+    );
+
+    doc.autoTable({
+      startY: y,
+      head: [headers],
+      body: data,
+      margin: { left: 10, right: 10 },
+      theme: "grid",
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [41, 128, 185] },
+    });
+
+    y = doc.lastAutoTable.finalY + 10;
+  }
+
+  // Adiciona as três tabelas ao PDF
+  adicionarTabela("Vacinas Aplicadas", "tabelaAplicadas");
+  adicionarTabela("Vacinas Atrasadas", "tabelaAtrasadas");
+  adicionarTabela("Vacinas Agendadas", "tabelaAgendadas");
+
+  // Salva o arquivo
+  doc.save("caderno-vacinas.pdf");
 }
 
 // ===============================

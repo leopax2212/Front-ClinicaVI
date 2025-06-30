@@ -22,7 +22,7 @@ function carregarNavbar() {
         menuItems.forEach((item) => {
           const texto = item.textContent.trim().toUpperCase();
           if (
-            ["USUÁRIOS", "DOENÇAS", "VACINAS", "AGENDAMENTOS"].includes(texto)
+            ["DASHBOARD", "USUÁRIOS", "DOENÇAS", "VACINAS", "AGENDAMENTOS"].includes(texto)
           ) {
             item.style.display = "none";
           }
@@ -622,24 +622,37 @@ function gerarPDF() {
   doc.text("Caderno Digital de Vacinas", 10, y);
   y += 10;
 
-  // Função auxiliar para adicionar uma tabela
+  // Dados do paciente vindos do localStorage
+  const nome = localStorage.getItem("nomeUsuario") || "Não informado";
+  const cpf = localStorage.getItem("cpfUsuario") || "Não informado";
+  const nascimento = localStorage.getItem("nascimentoUsuario") || "Não informado";
+  const email = localStorage.getItem("emailUsuario") || "Não informado";
+
+  const endereco = `${localStorage.getItem("ruaUsuario") || ""}, ${localStorage.getItem("numeroUsuario") || ""}, ${localStorage.getItem("bairroUsuario") || ""}, ${localStorage.getItem("cidadeUsuario") || ""} - ${localStorage.getItem("estadoUsuario") || ""}`;
+
+  // Adiciona dados ao PDF
+  doc.setFontSize(12);
+  doc.text(`Nome: ${nome}`, 10, y); y += 6;
+  doc.text(`CPF: ${cpf}`, 10, y); y += 6;
+  doc.text(`Nascimento: ${nascimento}`, 10, y); y += 6;
+  doc.text(`E-mail: ${email}`, 10, y); y += 6;
+  doc.text(`Endereço: ${endereco}`, 10, y); y += 10;
+
+  // Tabelas
   function adicionarTabela(titulo, tabelaId) {
     const tabela = document.getElementById(tabelaId);
     if (!tabela) return;
 
     const rows = tabela.querySelectorAll("tbody tr");
-
     if (rows.length === 0) return;
 
     doc.setFontSize(14);
     doc.text(titulo, 10, y);
     y += 6;
 
-    const headers = Array.from(tabela.querySelectorAll("thead th")).map(
-      (th) => th.textContent
-    );
-    const data = Array.from(rows).map((tr) =>
-      Array.from(tr.querySelectorAll("td")).map((td) => td.textContent)
+    const headers = Array.from(tabela.querySelectorAll("thead th")).map(th => th.textContent);
+    const data = Array.from(rows).map(tr =>
+      Array.from(tr.querySelectorAll("td")).map(td => td.textContent)
     );
 
     doc.autoTable({
@@ -655,12 +668,10 @@ function gerarPDF() {
     y = doc.lastAutoTable.finalY + 10;
   }
 
-  // Adiciona as três tabelas ao PDF
   adicionarTabela("Vacinas Aplicadas", "tabelaAplicadas");
   adicionarTabela("Vacinas Atrasadas", "tabelaAtrasadas");
   adicionarTabela("Vacinas Agendadas", "tabelaAgendadas");
 
-  // Salva o arquivo
   doc.save("caderno-vacinas.pdf");
 }
 

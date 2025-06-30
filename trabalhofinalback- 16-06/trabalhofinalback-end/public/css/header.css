@@ -154,4 +154,13 @@ body {
   background-color: transparent !important;
 }
 
+.vi-header,
+.vi-header * {
+  font-family: "Montserrat", sans-serif !important;
+}
+
+body.dashboard .vi-header,
+body.dashboard .vi-header * {
+  font-weight: 400 !important;
+}
 

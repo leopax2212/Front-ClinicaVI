@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard da Clínica</title>
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/header.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="../libs/chart.min.js" defer></script>
+  <script src="../libs/datatables.min.js" defer></script>
+</head>
+    
+<body>
+   
+  <body class="dashboard">
+
+  <div id="navbar-placeholder"></div>
+
+  <h1> Dashboard da Clínica</h1>
+
+  <div class="filtros">
+    <input type="date" id="dataInicio">
+    <input type="date" id="dataFim">
+    <select id="vacinaSelect">
+      <option value="">Todas as vacinas</option>
+    </select>
+    <button onclick="buscarDashboard()">Buscar</button>
+  </div>
+
+  <div class="cards">
+    <div id="totalCard" class="card"></div>
+    <div id="maisAgendadaCard" class="card"></div>
+  </div>
+
+  <div class="graficos">
+    <div>
+      <h3>Agendamentos por Dia</h3>
+      <canvas id="graficoLinha"></canvas>
+    </div>
+    <div>
+      <h3>Distribuição por Vacina</h3>
+      <canvas id="graficoPizza"></canvas>
+    </div>
+  </div>
+
+  <h3>Agendamentos Detalhados</h3>
+  <table id="tabelaAgendamentos" class="display">
+    <thead>
+      <tr>
+        <th>Paciente</th>
+        <th>Vacina</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="../js/script.js" defer></script>
+  <script src="../js/dashboard.js" defer></script>
+</body>
+</html>

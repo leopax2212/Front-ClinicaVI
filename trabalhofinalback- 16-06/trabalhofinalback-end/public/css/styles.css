@@ -20,14 +20,16 @@ body {
 .hero {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* Alinha o conteúdo centralmente na horizontal */
   height: 100vh;
-  padding: 100px 40px 40px;
+  padding: 100px 40px;
   background: linear-gradient(to right, #ffffff 0%, #ffffff 40%, #00c6ff 100%);
+  gap: 60px; /* Espaço entre texto e imagem */
 }
 
 .hero-content {
-  width: 45%;
+  width: 40%;
+  text-align: center;
 }
 
 .hero-content h1 {
@@ -76,13 +78,14 @@ body {
 }
 
 .hero-image {
-  width: 50%;
-  text-align: right;
+  width: 40%;
+  display: flex;
+  justify-content: center;
 }
 
 .hero-image img {
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
 }
 
 .slider {

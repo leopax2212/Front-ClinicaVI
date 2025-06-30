@@ -10,11 +10,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const campos = form.querySelectorAll("input");
   campos.forEach((input) => (input.disabled = true)); // inicia desabilitado
 
-  // Buscar dados do paciente logado e o selecionado pelo ADMIN
+  // Buscar dados do paciente logado ou o selecionado pelo ADMIN
   try {
     const idSelecionado = localStorage.getItem("editarUsuarioId");
     const url = idSelecionado
-      ? `http://localhost:8080/api/usuarios/${idSelecionado}`
+      ? `http://localhost:8080/api/pacientes/usuario/${idSelecionado}`
       : `http://localhost:8080/api/pacientes/me`;
 
     const response = await fetch(url, {
@@ -25,23 +25,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (response.ok) {
       const paciente = await response.json();
+      console.log("Paciente carregado:", paciente);
       pacienteId = paciente.id;
 
       document.getElementById("nome").value = paciente.nome;
       document.getElementById("email").value = paciente.email;
       document.getElementById("senha").value = paciente.senha;
       document.getElementById("cpf").value = paciente.cpf;
-      document.getElementById("dataNascimento").value = paciente.dataNascimento;
+
+      if (paciente.dataNascimento) {
+        const dataIso = new Date(paciente.dataNascimento).toISOString().split("T")[0];
+        document.getElementById("dataNascimento").value = dataIso;
+      }
+
       document.getElementById("rua").value = paciente.rua;
       document.getElementById("numero").value = paciente.numero;
       document.getElementById("bairro").value = paciente.bairro;
       document.getElementById("cidade").value = paciente.cidade;
       document.getElementById("estado").value = paciente.estado;
+
+      // ✅ Limpa o localStorage após usar
+      if (idSelecionado) {
+        localStorage.removeItem("editarUsuarioId");
+      }
     } else {
       alert("Erro ao buscar dados do usuário.");
     }
   } catch (error) {
     alert("Erro de conexão.");
+    console.error("Erro ao buscar paciente:", error);
   }
 
   // Atualizar / Confirmar
@@ -70,22 +82,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/pacientes/${pacienteId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
-          body: JSON.stringify(pacienteAtualizado),
-        }
-      );
+      const response = await fetch(`http://localhost:8080/api/pacientes/${pacienteId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+        body: JSON.stringify(pacienteAtualizado),
+      });
 
       if (response.ok) {
         alert("Cadastro atualizado com sucesso!");
 
-        // Desabilita os campos e remove estilo de edição
         campos.forEach((input) => {
           input.disabled = true;
           input.parentElement.classList.remove("editable");
@@ -99,6 +107,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (error) {
       alert("Erro ao conectar com o servidor.");
+      console.error("Erro ao atualizar paciente:", error);
     }
   });
 
@@ -108,15 +117,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!confirmar) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/pacientes/${pacienteId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-        }
-      );
+      const response = await fetch(`http://localhost:8080/api/pacientes/${pacienteId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      });
 
       if (response.ok) {
         alert("Conta excluída com sucesso.");
@@ -127,6 +133,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (error) {
       alert("Erro de conexão com o servidor.");
+      console.error("Erro ao excluir paciente:", error);
     }
   });
 });

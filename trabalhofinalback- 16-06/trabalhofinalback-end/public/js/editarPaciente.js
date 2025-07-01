@@ -34,7 +34,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("cpf").value = paciente.cpf;
 
       if (paciente.dataNascimento) {
-        const dataIso = new Date(paciente.dataNascimento).toISOString().split("T")[0];
+        const dataIso = new Date(paciente.dataNascimento)
+          .toISOString()
+          .split("T")[0];
         document.getElementById("dataNascimento").value = dataIso;
       }
 
@@ -82,14 +84,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-      const response = await fetch(`http://localhost:8080/api/pacientes/${pacienteId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-        body: JSON.stringify(pacienteAtualizado),
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/pacientes/${pacienteId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+          body: JSON.stringify(pacienteAtualizado),
+        }
+      );
 
       if (response.ok) {
         alert("Cadastro atualizado com sucesso!");
@@ -117,12 +122,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!confirmar) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/pacientes/${pacienteId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/pacientes/${pacienteId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      );
 
       if (response.ok) {
         alert("Conta excluída com sucesso.");
@@ -135,5 +143,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       alert("Erro de conexão com o servidor.");
       console.error("Erro ao excluir paciente:", error);
     }
+  });
+
+  const btnVoltar = document.getElementById("btnVoltar");
+
+  btnVoltar.addEventListener("click", () => {
+    // Voltar para a última página visitada
+    window.history.back();
   });
 });

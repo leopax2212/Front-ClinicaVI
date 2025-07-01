@@ -5,12 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clínica Vida Imunizada</title>
     <!-- Ícone padrão para navegadores -->
-    <link rel="icon" type="image/png" href="../808962.png">
+    <link rel="icon" type="image/png" href="../808962.png" />
     <link rel="stylesheet" href="../css/header.css" />
     <link rel="stylesheet" href="../css/styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.0/css/all.css" integrity="sha384-pSu6XzWrpv3H7Pa5H63Y5kkv5+RnYe7x9nI6Tv2LxK+1nUSYKUr58z/Lo2WnWz6a" crossorigin="anonymous"/>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v6.5.0/css/all.css"
+      integrity="sha384-pSu6XzWrpv3H7Pa5H63Y5kkv5+RnYe7x9nI6Tv2LxK+1nUSYKUr58z/Lo2WnWz6a"
+      crossorigin="anonymous"
+    />
   </head>
   <body>
     <div id="navbar-placeholder"></div>
@@ -25,6 +33,7 @@
           <div class="dots">
             <span class="dot active"></span>
             <span class="dot"></span>
+            <span class="dot"></span>
           </div>
         </div>
         <div class="hero-image">
@@ -34,7 +43,9 @@
 
       <!-- Tela 2 -->
       <section class="nosso-projeto">
-        <button class="voltar-btn" id="voltarBtn" title="Voltar">&#8592;</button>
+        <button class="voltar-btn" id="voltarBtn" title="Voltar">
+          &#8592;
+        </button>
         <div class="conteudo-projeto">
           <h2>Nosso Projeto</h2>
           <p>
@@ -59,6 +70,118 @@
             <div class="card">
               <h3>Valores</h3>
               <p>Compromisso, ética, acolhimento e inovação.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tela 3 - Faixas Etárias -->
+      <section class="faixa-etaria">
+        <button class="voltar-btn" id="voltarTela2Btn" title="Voltar">
+          &#8592;
+        </button>
+        <div class="conteudo-faixa">
+          <h2>Temos vacinas disponíveis para todas as idades</h2>
+          <p>
+            Atendendo todo o calendário sugerido pela SBIM (Sociedade Brasileira
+            de Imunizações)
+          </p>
+
+          <div class="cards-etarios">
+            <!-- Crianças -->
+            <div class="card-etario">
+              <img src="../img/criança.webp" alt="Crianças" />
+              <h3>Crianças</h3>
+              <p>De 00 a 10 anos</p>
+              <button class="verificar-btn" data-target="vacinas-criancas">
+                Verifique as vacinas
+              </button>
+              <ul class="lista-vacinas" id="vacinas-criancas">
+                <li>BCG</li>
+                <li>Hepatite B</li>
+                <li>Hexavalente/acelular</li>
+                <li>Pentavalente/acelular</li>
+                <li>Pneumo 15-valente</li>
+                <li>Rotavírus Pentavalente</li>
+                <li>Meningocócica ACWY</li>
+                <li>Meningocócica B</li>
+                <li>Influenza (Gripe)</li>
+                <li>Febre Amarela</li>
+                <li>Tríplice Viral</li>
+                <li>Varicela</li>
+                <li>DTPa + IPV</li>
+              </ul>
+            </div>
+
+            <!-- Adolescentes -->
+            <div class="card-etario">
+              <img src="../img/adolescente.webp" alt="Adolescentes" />
+              <h3>Adolescentes</h3>
+              <p>De 11 a 19 anos</p>
+              <button class="verificar-btn" data-target="vacinas-adolescentes">
+                Verifique as vacinas
+              </button>
+              <ul class="lista-vacinas" id="vacinas-adolescentes">
+                <li>HPV quadrivalente</li>
+                <li>Hepatite B</li>
+                <li>Meningocócica ACWY</li>
+                <li>Tríplice Viral</li>
+                <li>DTPa (reforço)</li>
+                <li>Varicela</li>
+                <li>Influenza (Gripe)</li>
+              </ul>
+            </div>
+
+            <!-- Adultos -->
+            <div class="card-etario">
+              <img src="../img/adultos.webp" alt="Adultos" />
+              <h3>Adultos</h3>
+              <p>De 20 a 59 anos</p>
+              <button class="verificar-btn" data-target="vacinas-adultos">
+                Verifique as vacinas
+              </button>
+              <ul class="lista-vacinas" id="vacinas-adultos">
+                <li>Hepatite B</li>
+                <li>Tríplice Viral (se não recebeu na infância)</li>
+                <li>Febre Amarela</li>
+                <li>Influenza (Gripe)</li>
+                <li>dT ou DTPa (reforço a cada 10 anos)</li>
+                <li>COVID-19</li>
+              </ul>
+            </div>
+
+            <!-- Idosos -->
+            <div class="card-etario">
+              <img src="../img/idosos.webp" alt="Idosos" />
+              <h3>Idosos</h3>
+              <p>60+ anos</p>
+              <button class="verificar-btn" data-target="vacinas-idosos">
+                Verifique as vacinas
+              </button>
+              <ul class="lista-vacinas" id="vacinas-idosos">
+                <li>Influenza (Gripe)</li>
+                <li>Pneumocócica 23-valente</li>
+                <li>Hepatite B</li>
+                <li>dT ou DTPa (reforço)</li>
+                <li>Herpes Zóster</li>
+                <li>COVID-19</li>
+              </ul>
+            </div>
+
+            <!-- Gestantes -->
+            <div class="card-etario">
+              <img src="../img/gestantes.webp" alt="Gestantes" />
+              <h3>Gestantes</h3>
+              <p>Toda gestação</p>
+              <button class="verificar-btn" data-target="vacinas-gestantes">
+                Verifique as vacinas
+              </button>
+              <ul class="lista-vacinas" id="vacinas-gestantes">
+                <li>dTpa (a partir da 20ª semana)</li>
+                <li>Influenza (Gripe)</li>
+                <li>Hepatite B (se não vacinada)</li>
+                <li>COVID-19 (recomendada)</li>
+              </ul>
             </div>
           </div>
         </div>

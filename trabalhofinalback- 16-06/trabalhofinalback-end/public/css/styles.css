@@ -176,3 +176,109 @@ body {
 .voltar-btn:hover {
   transform: scale(1.1);
 }
+
+.faixa-etaria {
+  width: 100vw;
+  height: 100vh;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  padding: 40px 20px;
+  padding-top: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  overflow-y: auto;
+}
+
+.conteudo-faixa {
+  max-width: 1000px;
+  text-align: center;
+}
+
+.conteudo-faixa h2 {
+  color: #007bff;
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.conteudo-faixa p {
+  color: #000000;
+  margin-bottom: 30px;
+}
+
+.cards-etarios {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  overflow-x: auto;
+  gap: 20px;
+}
+
+.card-etario {
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  width: 280px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.card-etario img {
+  width: 100%;
+  border-radius: 15px;
+  height: 180px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.card-etario h3 {
+  color: #66697e;
+  margin-bottom: 5px;
+}
+
+.card-etario p {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.verificar-btn {
+  background: none;
+  border: 2px solid #00c6ff;
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #00c6ff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: 0.3s;
+}
+
+.verificar-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+.lista-vacinas {
+  list-style: none;
+  padding: 0;
+  display: none;
+  margin-top: 10px;
+  text-align: left;
+  color: #333;
+}
+
+.lista-vacinas li {
+  margin-bottom: 5px;
+}
+
+/* Botão "Verifique as vacinas" da Tela 2 */
+.conteudo-projeto .btn {
+  margin-top: 40px;
+}
+
+.conteudo-projeto .btn:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+

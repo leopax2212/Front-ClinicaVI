@@ -22,7 +22,13 @@ function carregarNavbar() {
         menuItems.forEach((item) => {
           const texto = item.textContent.trim().toUpperCase();
           if (
-            ["DASHBOARD", "USUÁRIOS", "DOENÇAS", "VACINAS", "AGENDAMENTOS"].includes(texto)
+            [
+              "DASHBOARD",
+              "USUÁRIOS",
+              "DOENÇAS",
+              "VACINAS",
+              "AGENDAMENTOS",
+            ].includes(texto)
           ) {
             item.style.display = "none";
           }
@@ -88,6 +94,41 @@ function configurarTelaInicial() {
     });
   }
 }
+document.addEventListener("DOMContentLoaded", function () {
+  configurarTelaInicial();
+
+  const slider = document.querySelector(".slider");
+
+  const avancarParaTela3 = document.createElement("button");
+  avancarParaTela3.textContent = "Verique as vacinas";
+  avancarParaTela3.className = "btn";
+  document.querySelector(".conteudo-projeto")?.appendChild(avancarParaTela3);
+
+  avancarParaTela3.addEventListener("click", () => {
+    slider.style.transform = "translateX(-200vw)";
+    document.getElementById("voltarTela2Btn").classList.add("show");
+  });
+
+  const voltarTela2Btn = document.getElementById("voltarTela2Btn");
+  voltarTela2Btn.addEventListener("click", () => {
+    slider.style.transform = "translateX(-100vw)";
+    voltarTela2Btn.classList.remove("show");
+  });
+
+  document.querySelectorAll(".verificar-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-target");
+      const lista = document.getElementById(targetId);
+      const isVisible = lista.style.display === "block";
+
+      document
+        .querySelectorAll(".lista-vacinas")
+        .forEach((ul) => (ul.style.display = "none"));
+
+      lista.style.display = isVisible ? "none" : "block";
+    });
+  });
+});
 
 // =======================
 // 3. Agendamento (agendamento.html)
@@ -625,18 +666,28 @@ function gerarPDF() {
   // Dados do paciente vindos do localStorage
   const nome = localStorage.getItem("nomeUsuario") || "Não informado";
   const cpf = localStorage.getItem("cpfUsuario") || "Não informado";
-  const nascimento = localStorage.getItem("nascimentoUsuario") || "Não informado";
+  const nascimento =
+    localStorage.getItem("nascimentoUsuario") || "Não informado";
   const email = localStorage.getItem("emailUsuario") || "Não informado";
 
-  const endereco = `${localStorage.getItem("ruaUsuario") || ""}, ${localStorage.getItem("numeroUsuario") || ""}, ${localStorage.getItem("bairroUsuario") || ""}, ${localStorage.getItem("cidadeUsuario") || ""} - ${localStorage.getItem("estadoUsuario") || ""}`;
+  const endereco = `${localStorage.getItem("ruaUsuario") || ""}, ${
+    localStorage.getItem("numeroUsuario") || ""
+  }, ${localStorage.getItem("bairroUsuario") || ""}, ${
+    localStorage.getItem("cidadeUsuario") || ""
+  } - ${localStorage.getItem("estadoUsuario") || ""}`;
 
   // Adiciona dados ao PDF
   doc.setFontSize(12);
-  doc.text(`Nome: ${nome}`, 10, y); y += 6;
-  doc.text(`CPF: ${cpf}`, 10, y); y += 6;
-  doc.text(`Nascimento: ${nascimento}`, 10, y); y += 6;
-  doc.text(`E-mail: ${email}`, 10, y); y += 6;
-  doc.text(`Endereço: ${endereco}`, 10, y); y += 10;
+  doc.text(`Nome: ${nome}`, 10, y);
+  y += 6;
+  doc.text(`CPF: ${cpf}`, 10, y);
+  y += 6;
+  doc.text(`Nascimento: ${nascimento}`, 10, y);
+  y += 6;
+  doc.text(`E-mail: ${email}`, 10, y);
+  y += 6;
+  doc.text(`Endereço: ${endereco}`, 10, y);
+  y += 10;
 
   // Tabelas
   function adicionarTabela(titulo, tabelaId) {
@@ -650,9 +701,11 @@ function gerarPDF() {
     doc.text(titulo, 10, y);
     y += 6;
 
-    const headers = Array.from(tabela.querySelectorAll("thead th")).map(th => th.textContent);
-    const data = Array.from(rows).map(tr =>
-      Array.from(tr.querySelectorAll("td")).map(td => td.textContent)
+    const headers = Array.from(tabela.querySelectorAll("thead th")).map(
+      (th) => th.textContent
+    );
+    const data = Array.from(rows).map((tr) =>
+      Array.from(tr.querySelectorAll("td")).map((td) => td.textContent)
     );
 
     doc.autoTable({
